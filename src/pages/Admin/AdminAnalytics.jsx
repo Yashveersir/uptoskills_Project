@@ -23,7 +23,7 @@ const AdminAnalytics = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white dark:bg-neutral-900 p-8 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-soft"
+            className="bg-white dark:bg-neutral-900 p-6 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-card"
           >
             <div className="flex justify-between items-start mb-6">
               <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
@@ -45,7 +45,7 @@ const AdminAnalytics = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 rounded-[2.5rem] p-10 border border-neutral-200 dark:border-neutral-800 shadow-soft">
+        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 rounded-lg p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-card">
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-xl font-display font-bold text-neutral-900 dark:text-neutral-50 flex items-center gap-3">
                <LineChart size={24} className="text-primary-500" />
@@ -78,9 +78,9 @@ const AdminAnalytics = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-10 border border-neutral-200 dark:border-neutral-800 shadow-soft">
+        <div className="bg-white dark:bg-neutral-900 rounded-lg p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-card">
           <h3 className="text-xl font-display font-bold text-neutral-900 dark:text-neutral-50 mb-10 flex items-center gap-3">
-             <PieChart size={24} className="text-accent-500" />
+             <PieChart size={24} className="text-secondary-500" />
              Categories
           </h3>
           <div className="space-y-8">

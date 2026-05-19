@@ -12,12 +12,6 @@ const Home = () => {
     <div className="bg-white dark:bg-neutral-950 transition-colors duration-300">
       {/* ================= HERO SECTION ================= */}
       <section className="relative min-h-[95vh] flex items-center justify-center px-6 overflow-hidden bg-neutral-50 dark:bg-neutral-900/20">
-        {/* Background Decorative Elements */}
-        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[150px]" />
-          <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-secondary-500/10 rounded-full blur-[120px]" />
-        </div>
-
         <div className="text-center max-w-5xl mx-auto pt-20">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -59,12 +53,12 @@ const Home = () => {
             {isAuthenticated ? (
               <>
                 <Link to="/dashboard">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto px-10 rounded-2xl">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto px-10">
                     Go to Dashboard
                   </Button>
                 </Link>
                 <Link to="/courses">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-10 rounded-2xl">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-10">
                     Explore Courses
                   </Button>
                 </Link>
@@ -72,12 +66,12 @@ const Home = () => {
             ) : (
               <>
                 <Link to="/courses">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto px-10 rounded-2xl">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto px-10">
                     Browse Courses
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-10 rounded-2xl">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto px-10">
                     Start for Free
                   </Button>
                 </Link>
@@ -121,7 +115,7 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="group bg-white dark:bg-neutral-900 rounded-[2.5rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 focus-within:ring-2 focus-within:ring-primary-500"
+                className="group bg-white dark:bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-card hover:shadow-cardHover transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-primary-500"
               >
                 <div className="aspect-[4/5] overflow-hidden relative">
                   <img 
@@ -152,10 +146,7 @@ const Home = () => {
 
       {/* ================= CTA SECTION ================= */}
       <section className="py-24 px-6">
-         <div className="max-w-6xl mx-auto rounded-[3.5rem] bg-neutral-900 dark:bg-neutral-900 p-12 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-neutral-900/30">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/20 rounded-full -mr-48 -mt-48 blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary-500/20 rounded-full -ml-32 -mb-32 blur-3xl" />
-            
+         <div className="max-w-6xl mx-auto rounded-xl bg-neutral-900 dark:bg-neutral-900 p-12 md:p-20 text-center relative overflow-hidden shadow-overlay">
             <h2 className="text-4xl md:text-6xl font-display font-bold text-white mb-8 leading-tight tracking-tight">
                {isAuthenticated ? "Accelerate Your Career Today" : "Ready to launch your corporate career?"}
             </h2>
@@ -168,7 +159,7 @@ const Home = () => {
             </p>
 
             <Link to={isAuthenticated ? "/dashboard" : "/register"}>
-               <Button variant="primary" size="lg" className="px-12 py-5 text-lg hover:scale-105 transition-all rounded-2xl">
+               <Button variant="primary" size="lg" className="px-12 py-5 text-lg hover:scale-105 transition-all">
                   {isAuthenticated ? "Go to Dashboard" : "Enroll Now for Free"}
                </Button>
             </Link>

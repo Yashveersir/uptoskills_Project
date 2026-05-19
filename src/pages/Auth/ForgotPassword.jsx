@@ -46,17 +46,10 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 px-6 relative overflow-hidden">
-      
-      {/* Decorative background blur */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full -z-10 opacity-20 pointer-events-none">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary-500/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-accent-500/20 rounded-full blur-[100px]" />
-      </div>
-
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] p-8 md:p-12 shadow-xl"
+        className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-8 md:p-10 shadow-card"
       >
         <div className="mb-10">
           <Link to="/login" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-10 group">
@@ -64,11 +57,11 @@ const ForgotPassword = () => {
             Back to Sign In
           </Link>
           
-          <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/20 rounded-2xl flex items-center justify-center mb-6 border border-primary-100 dark:border-primary-900/30">
+          <div className="w-16 h-16 bg-primary-50 dark:bg-primary-900/20 rounded-lg flex items-center justify-center mb-6 border border-primary-100 dark:border-primary-900/30">
              <ShieldCheck size={32} className="text-primary-600 dark:text-primary-400" />
           </div>
 
-          <h1 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-orange-400 mb-3 tracking-tight">
+          <h1 className="text-3xl font-display font-bold text-neutral-900 dark:text-neutral-50 mb-3 tracking-tight">
             Secure Recovery
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed">
@@ -83,9 +76,9 @@ const ForgotPassword = () => {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 p-4 rounded-2xl mb-6 text-sm font-medium flex items-center gap-3"
+            className="bg-status-error/10 border border-status-error/20 text-status-error p-4 rounded-lg mb-6 text-sm font-medium flex items-center gap-3"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+            <div className="w-1.5 h-1.5 rounded-full bg-status-error" />
             {error}
           </motion.div>
         )}
@@ -105,7 +98,7 @@ const ForgotPassword = () => {
               type="submit" 
               variant="primary"
               isLoading={loading} 
-              className="w-full py-4 text-base rounded-2xl"
+              className="w-full py-4 text-base"
             >
               <Send size={18} className="mr-2" />
               Send Recovery Link
@@ -113,12 +106,12 @@ const ForgotPassword = () => {
           </form>
         ) : (
           <div className="space-y-6">
-             <div className="p-6 rounded-2xl bg-primary-50 dark:bg-primary-500/5 border border-primary-100 dark:border-primary-500/10 text-center">
+             <div className="p-6 rounded-lg bg-primary-50 dark:bg-primary-500/5 border border-primary-100 dark:border-primary-500/10 text-center">
                 <p className="text-primary-700 dark:text-primary-400 font-medium text-sm">
                   Check <span className="text-neutral-900 dark:text-white">{email}</span> for the link.
                 </p>
              </div>
-             <Button variant="outline" className="w-full py-4 rounded-2xl border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400" onClick={() => setIsSent(false)}>
+             <Button variant="outline" className="w-full py-4 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400" onClick={() => setIsSent(false)}>
                Resend Email
              </Button>
           </div>

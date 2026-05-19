@@ -12,8 +12,8 @@ const Features = () => {
     {
       title: "Placement Assistance",
       description: "We don't just teach; we help you get placed. Our network of 500+ corporate partners is waiting for skilled candidates like you.",
-      icon: <Users className="text-accent-600 dark:text-accent-400" />,
-      color: "bg-accent-50 dark:bg-accent-900/40"
+      icon: <Users className="text-secondary-600 dark:text-secondary-400" />,
+      color: "bg-secondary-50 dark:bg-secondary-900/40"
     },
     {
       title: "Hands-on Projects",
@@ -36,8 +36,8 @@ const Features = () => {
     {
       title: "Global Community",
       description: "Join a vibrant community of learners and mentors from around the world, fostering collaboration and growth.",
-      icon: <Globe className="text-accent-600 dark:text-accent-400" />,
-      color: "bg-accent-50 dark:bg-accent-900/40"
+      icon: <Globe className="text-secondary-600 dark:text-secondary-400" />,
+      color: "bg-secondary-50 dark:bg-secondary-900/40"
     }
   ];
 
@@ -48,7 +48,7 @@ const Features = () => {
           <motion.span 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent-600 dark:text-accent-500 mb-4 inline-block"
+            className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary-600 dark:text-secondary-500 mb-4 inline-block"
           >
             The Platform
           </motion.span>
@@ -57,7 +57,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-display font-bold text-neutral-900 dark:text-white"
           >
-            Redefining the <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-orange-400">Learning Experience</span>
+            Redefining the <span className="font-serif italic font-normal text-primary-500">Learning Experience</span>
           </motion.h2>
         </div>
 
@@ -69,9 +69,9 @@ const Features = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-accent-500/30 hover:shadow-2xl hover:shadow-accent-500/10 transition-all duration-300 hover:-translate-y-1"
+              className="group p-8 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-secondary-500/30 hover:shadow-cardHover transition-all duration-300 hover:-translate-y-1"
             >
-              <div className={`w-14 h-14 rounded-2xl bg-accent-50 dark:bg-accent-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+              <div className={`w-14 h-14 rounded-lg ${feature.color} flex items-center justify-center mb-6 group-hover:scale-105 transition-transform`}>
                 <motion.div
                   whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
                   transition={{ duration: 0.5 }}
@@ -79,7 +79,7 @@ const Features = () => {
                   {feature.icon}
                 </motion.div>
               </div>
-              <h3 className="text-xl font-display font-bold text-neutral-900 dark:text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-orange-400 transition-all">
+              <h3 className="text-xl font-display font-bold text-neutral-900 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                 {feature.title}
               </h3>
               <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed text-sm">

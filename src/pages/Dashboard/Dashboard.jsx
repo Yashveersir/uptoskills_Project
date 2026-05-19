@@ -56,19 +56,19 @@ const Dashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-3xl font-display font-bold text-neutral-900 dark:text-neutral-50"
           >
-            Welcome back, Learner! 👋
+            Welcome back, Learner
           </motion.h1>
           <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
             You have completed <span className="text-primary-600 dark:text-primary-400 font-bold">65%</span> of your weekly goal. Keep it up!
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" size="sm" className="hidden sm:flex rounded-xl text-primary-600 dark:text-primary-400 border-primary-200 dark:border-primary-900/30 hover:bg-primary-50 dark:hover:bg-primary-900/10">
+          <Button variant="outline" size="sm" className="hidden sm:flex text-primary-600 dark:text-primary-400 border-primary-200 dark:border-primary-900/30 hover:bg-primary-50 dark:hover:bg-primary-900/10">
             <Sparkles size={16} className="mr-2" />
             AI Recommendations
           </Button>
           <Link to="/courses">
-            <Button variant="primary" size="sm" className="rounded-xl">Browse Courses</Button>
+            <Button variant="primary" size="sm">Browse Courses</Button>
           </Link>
         </div>
       </div>
@@ -81,7 +81,7 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm"
+            className="bg-white dark:bg-neutral-900 p-6 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-card"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${stat.bg}`}>
@@ -108,12 +108,12 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {loading ? [1,2].map(i => <div key={i} className="h-40 bg-neutral-100 dark:bg-neutral-800 rounded-3xl animate-pulse" />) :
+          {loading ? [1,2].map(i => <div key={i} className="h-40 bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse" />) :
           courses.slice(0, 2).map((course) => (
             <motion.div
               key={course.id}
               whileHover={{ y: -4 }}
-              className="bg-white dark:bg-neutral-900 rounded-[2rem] p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md hover:border-primary-500/30 flex flex-col sm:flex-row gap-6 transition-all focus-within:ring-2 focus-within:ring-primary-500 outline-none"
+              className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-neutral-200 dark:border-neutral-800 shadow-card hover:shadow-cardHover hover:border-primary-500/30 flex flex-col sm:flex-row gap-6 transition-all focus-within:ring-2 focus-within:ring-primary-500 outline-none"
             >
               <div className="w-full sm:w-40 h-28 rounded-2xl overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 relative group">
                 <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -147,7 +147,7 @@ const Dashboard = () => {
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? [1,2,3].map(i => <SkeletonCard key={i} />) :
             courses.map(course => (
-              <div key={course.id} className="bg-white dark:bg-neutral-900 rounded-[2rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 group shadow-sm hover:shadow-md hover:border-primary-500/30 transition-all flex flex-col focus-within:ring-2 focus-within:ring-primary-500">
+              <div key={course.id} className="bg-white dark:bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 group shadow-card hover:shadow-cardHover hover:border-primary-500/30 transition-all flex flex-col focus-within:ring-2 focus-within:ring-primary-500">
                 <div className="aspect-video relative overflow-hidden">
                   <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute top-4 left-4">

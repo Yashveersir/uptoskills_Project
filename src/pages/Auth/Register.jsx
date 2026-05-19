@@ -57,27 +57,20 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 px-6 py-12 relative overflow-hidden">
-      
-      {/* Decorative background blur */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full -z-10 opacity-20 pointer-events-none">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/20 rounded-full blur-[100px]" />
-      </div>
-
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] p-8 md:p-10 shadow-xl"
+        className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-8 md:p-10 shadow-card"
       >
         <div className="text-center mb-10">
           <Link to="/" className="inline-flex items-center gap-2 mb-6 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12 shadow-lg shadow-primary-500/20">
+            <div className="w-12 h-12 bg-primary-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-6 shadow-lg shadow-primary-500/20">
               <span className="text-white font-bold text-2xl">A</span>
             </div>
             <span className="text-2xl font-display font-bold text-neutral-900 dark:text-white tracking-tight">AI Learn</span>
           </Link>
-          <h1 className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-orange-400 mb-2">
+          <h1 className="text-3xl font-display font-bold text-neutral-900 dark:text-neutral-50 mb-2">
             Create Account
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">
@@ -89,9 +82,9 @@ const Register = () => {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 p-4 rounded-2xl mb-6 text-sm font-medium flex items-center gap-3"
+            className="bg-status-error/10 border border-status-error/20 text-status-error p-4 rounded-lg mb-6 text-sm font-medium flex items-center gap-3"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-status-error" />
             {error}
           </motion.div>
         )}
@@ -141,7 +134,7 @@ const Register = () => {
               type="submit" 
               variant="primary"
               isLoading={loading} 
-              className="w-full py-4 text-base rounded-2xl"
+            className="w-full py-4 text-base"
             >
               Get Started
             </Button>

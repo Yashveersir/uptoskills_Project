@@ -122,7 +122,7 @@ const CourseDetails = () => {
             </p>
           </section>
 
-          <section className="p-10 rounded-[2.5rem] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <section className="p-8 md:p-10 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-card">
             <h3 className="text-2xl font-display font-bold text-neutral-900 dark:text-neutral-50 mb-8">What you'll master</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
@@ -179,7 +179,7 @@ const CourseDetails = () => {
             transition={{ delay: 0.4 }}
             className="sticky top-32"
           >
-            <div className="p-10 rounded-[2.5rem] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-primary-500/5 relative overflow-hidden">
+            <div className="p-8 md:p-10 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-card relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] dark:opacity-5">
                  <Award size={120} className="text-primary-500" />
               </div>
@@ -223,7 +223,7 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            <div className="mt-8 p-8 rounded-[2rem] bg-secondary-50 dark:bg-secondary-900/10 border border-secondary-100 dark:border-secondary-900/20 text-center shadow-sm">
+            <div className="mt-8 p-8 rounded-lg bg-secondary-50 dark:bg-secondary-900/10 border border-secondary-100 dark:border-secondary-900/20 text-center shadow-sm">
                <p className="text-secondary-600 dark:text-secondary-400 text-xs font-bold uppercase tracking-widest mb-2">100% Satisfaction Guarantee</p>
                <p className="text-neutral-500 dark:text-neutral-400 text-[10px] leading-relaxed">Risk-free learning with our curated AI-driven masterclass curriculum.</p>
             </div>

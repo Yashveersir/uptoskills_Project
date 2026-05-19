@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useId } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { adminClasses } from "../../designTokens";
 
 const Input = React.forwardRef(({ 
   label, 
@@ -8,9 +10,13 @@ const Input = React.forwardRef(({
   id, 
   icon: Icon,
   rightElement,
+  isValid,
+  helperText,
   ...props 
 }, ref) => {
-  const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const describedBy = error || helperText ? `${inputId}-feedback` : undefined;
 
   return (
     <div className={`space-y-1 ${containerClassName}`}>
@@ -28,28 +34,44 @@ const Input = React.forwardRef(({
         <input
           id={inputId}
           ref={ref}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy}
           className={`
-            block w-full rounded-2xl border border-neutral-200 dark:border-neutral-800 
+            block w-full rounded-lg border border-neutral-200 dark:border-neutral-800 
             bg-white dark:bg-neutral-900 px-4 py-3.5 text-sm text-neutral-900 dark:text-neutral-50
             placeholder:text-neutral-400 dark:placeholder:text-neutral-500
             transition-all duration-200 ease-in-out shadow-sm
-            focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20
+            focus:border-primary-500
             disabled:cursor-not-allowed disabled:opacity-50
             ${Icon ? "pl-11" : ""}
-            ${rightElement ? "pr-12" : ""}
-            ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : ""}
+            ${rightElement || isValid || error ? "pr-12" : ""}
+            ${adminClasses.focus}
+            ${error ? "border-status-error focus:border-status-error focus:ring-status-error/20" : ""}
+            ${isValid ? "border-status-success focus:border-status-success focus:ring-status-success/20" : ""}
             ${className}
           `}
           {...props}
         />
+        {isValid && !rightElement && (
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center text-status-success">
+            <CheckCircle2 size={18} aria-hidden="true" />
+          </div>
+        )}
+        {error && !rightElement && (
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center text-status-error">
+            <AlertCircle size={18} aria-hidden="true" />
+          </div>
+        )}
         {rightElement && (
           <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
             {rightElement}
           </div>
         )}
       </div>
-      {error && (
-        <p className="text-sm text-red-500 mt-1">{error}</p>
+      {(error || helperText) && (
+        <p id={describedBy} className={`mt-1 text-xs ${error ? "text-status-error" : "text-neutral-500 dark:text-neutral-400"}`}>
+          {error || helperText}
+        </p>
       )}
     </div>
   );

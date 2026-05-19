@@ -10,7 +10,7 @@ const CourseCard = ({ course }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4 }}
-      className="group bg-white dark:bg-neutral-900 rounded-[2rem] overflow-hidden border border-neutral-200 dark:border-neutral-800 hover:shadow-elevated transition-all duration-500 hover:-translate-y-2 flex flex-col h-full"
+      className="group bg-white dark:bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 hover:shadow-cardHover transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
@@ -75,7 +75,7 @@ const CourseCard = ({ course }) => {
           </div>
 
           <Link to={`/courses/${course.id}`}>
-            <Button variant="outline" size="sm" className="group/btn gap-2 rounded-xl text-xs">
+            <Button variant="outline" size="sm" className="group/btn text-xs">
               View Details
               <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
             </Button>

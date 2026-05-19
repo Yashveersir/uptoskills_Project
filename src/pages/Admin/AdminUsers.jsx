@@ -1,282 +1,266 @@
-import { useState, useMemo } from "react";
-import Button from "../../components/common/Button";
-import Input from "../../components/common/Input";
-import EmptyState from "../../components/common/EmptyState";
-import { Search, UserPlus, Shield, UserX, Edit2, Mail, Calendar, ChevronDown, Filter, Download, Archive, Trash2, MoreVertical } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { Archive, Calendar, Eye, Mail, MoreVertical, Pencil, Shield, Trash2, UserPlus, UserX } from "lucide-react";
+import Button from "../../components/common/Button";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
+import DataTable from "../../components/common/DataTable";
+import Input from "../../components/common/Input";
+import Modal from "../../components/common/Modal";
+import { adminClasses } from "../../designTokens";
+
+const initialUsers = [
+  { id: 1, name: "Ayan Khan", email: "ayan@example.com", role: "Student", joined: "2026-05-12", status: "Active", cohortSize: 120 },
+  { id: 2, name: "Sarah Smith", email: "sarah@example.com", role: "Student", joined: "2026-05-10", status: "Active", cohortSize: 80 },
+  { id: 3, name: "Rahul Sharma", email: "rahul@example.com", role: "Intern", joined: "2026-05-08", status: "Pending", cohortSize: 42 },
+  { id: 4, name: "John Admin", email: "admin@example.com", role: "Admin", joined: "2026-05-01", status: "Active", cohortSize: 12 },
+  { id: 5, name: "Jessica Doe", email: "jessica@example.com", role: "Student", joined: "2026-04-28", status: "Suspended", cohortSize: 63 },
+  { id: 6, name: "Mike Ross", email: "mike@example.com", role: "Mentor", joined: "2026-04-15", status: "Active", cohortSize: 210 },
+  { id: 7, name: "Rachel Zane", email: "rachel@example.com", role: "Student", joined: "2026-04-10", status: "Active", cohortSize: 96 },
+];
+
+const getPasswordScore = (password) => {
+  const checks = [
+    password.length >= 8,
+    /[A-Z]/.test(password),
+    /[0-9]/.test(password),
+    /[^A-Za-z0-9]/.test(password),
+  ];
+  return checks.filter(Boolean).length;
+};
 
 const AdminUsers = () => {
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("All Roles");
-  
-  // Table Enhancements State
-  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
-
-  const [users, setUsers] = useState([
-    { id: 1, name: "Ayan Khan", email: "ayan@example.com", role: "Student", joined: "2026-05-12", status: "Active" },
-    { id: 2, name: "Sarah Smith", email: "sarah@example.com", role: "Student", joined: "2026-05-10", status: "Active" },
-    { id: 3, name: "Rahul Sharma", email: "rahul@example.com", role: "Student", joined: "2026-05-08", status: "Active" },
-    { id: 4, name: "John Admin", email: "admin@example.com", role: "Admin", joined: "2026-05-01", status: "Active" },
-    { id: 5, name: "Jessica Doe", email: "jessica@example.com", role: "Student", joined: "2026-04-28", status: "Suspended" },
-    { id: 6, name: "Mike Ross", email: "mike@example.com", role: "Student", joined: "2026-04-15", status: "Active" },
-    { id: 7, name: "Rachel Zane", email: "rachel@example.com", role: "Student", joined: "2026-04-10", status: "Active" },
-  ]);
-
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const sortedUsers = useMemo(() => {
-    let sortableUsers = [...users];
-    if (sortConfig !== null) {
-      sortableUsers.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-    return sortableUsers;
-  }, [users, sortConfig]);
-
-  const filteredUsers = sortedUsers.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = roleFilter === "All Roles" || u.role === roleFilter;
-    return matchesSearch && matchesRole;
+  const [users, setUsers] = useState(initialUsers);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "Student",
+    cohortSize: "50",
   });
 
-  // Pagination logic
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredUsers.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+  const nameValid = formData.name.trim().length >= 2;
+  const passwordScore = getPasswordScore(formData.password);
+  const passwordValid = passwordScore >= 3;
+  const cohortNumber = Number(formData.cohortSize);
+  const cohortValid = Number.isFinite(cohortNumber) && cohortNumber >= 1 && cohortNumber <= 500;
+  const canSubmit = nameValid && emailValid && passwordValid && cohortValid;
 
-  const toggleSelectAll = () => {
-    if (selectedIds.length === currentRows.length && currentRows.length > 0) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(currentRows.map(u => u.id));
-    }
+  const handleInvite = (event) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+
+    setUsers((current) => [
+      {
+        id: Date.now(),
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        joined: new Date().toISOString().slice(0, 10),
+        status: "Pending",
+        cohortSize: cohortNumber,
+      },
+      ...current,
+    ]);
+    setFormData({ name: "", email: "", password: "", role: "Student", cohortSize: "50" });
+    setIsInviteOpen(false);
+    toast.success("Invitation created successfully.");
   };
 
-  const toggleSelect = (id) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
-    }
+  const handleBulkDelete = (ids, clearSelection) => {
+    setUsers((current) => current.filter((user) => !ids.includes(user.id)));
+    clearSelection([]);
+    toast.success("Selected users deleted.");
   };
 
-  const handleBulkDelete = () => {
-    if (confirm(`Are you sure you want to delete ${selectedIds.length} user(s)?`)) {
-      setUsers(users.filter(u => !selectedIds.includes(u.id)));
-      setSelectedIds([]);
-      toast.success("Selected users deleted successfully.");
-      setCurrentPage(1);
-    }
-  };
-
-  const handleDeleteUser = (id) => {
-    setUsers(users.filter(u => u.id !== id));
-    toast.success("User deleted successfully.");
-  };
+  const columns = useMemo(() => [
+    {
+      key: "name",
+      header: "User",
+      sortable: true,
+      render: (user) => (
+        <div className="flex items-center gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-secondary-100 bg-secondary-50 text-sm font-semibold text-secondary-700 dark:border-secondary-500/20 dark:bg-secondary-500/10 dark:text-secondary-300">
+            {user.name.charAt(0)}
+          </div>
+          <div>
+            <p className="font-semibold text-neutral-900 dark:text-neutral-50">{user.name}</p>
+            <p className="mt-1 flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400"><Mail size={12} /> {user.email}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "role",
+      header: "Role",
+      sortable: true,
+      render: (user) => user.role === "Admin" ? (
+        <span className="inline-flex items-center gap-2 rounded-lg border border-secondary-500/20 bg-secondary-500/10 px-3 py-1 text-xs font-semibold text-secondary-600 dark:text-secondary-300">
+          <Shield size={14} />
+          {user.role}
+        </span>
+      ) : user.role,
+    },
+    {
+      key: "joined",
+      header: "Joined",
+      sortable: true,
+      render: (user) => (
+        <span className="inline-flex items-center gap-2 text-neutral-600 dark:text-neutral-300">
+          <Calendar size={14} />
+          {new Date(user.joined).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      render: (user) => (
+        <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${user.status === "Active" ? "border-status-success/20 bg-status-success/10 text-status-success" : user.status === "Pending" ? "border-status-warning/20 bg-status-warning/10 text-status-warning" : "border-status-error/20 bg-status-error/10 text-status-error"}`}>
+          {user.status}
+        </span>
+      ),
+    },
+    { key: "cohortSize", header: "Cohort", sortable: true },
+  ], []);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-7xl mx-auto">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+    <div className="space-y-8">
+      <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-4xl font-display font-bold text-neutral-900 dark:text-neutral-50 mb-2 tracking-tight">User Directory</h1>
-          <p className="text-neutral-500 dark:text-neutral-400">Manage learner accounts and platform permissions.</p>
+          <p className={adminClasses.label}>Access control</p>
+          <h1 className={`${adminClasses.heading} mt-2`}>User Directory</h1>
+          <p className={`${adminClasses.body} mt-2`}>Manage learners, interns, mentors, and admin permissions.</p>
         </div>
-        <Button variant="primary" className="flex items-center gap-2 rounded-2xl py-3.5 px-8 shadow-xl shadow-primary-500/20">
+        <Button variant="primary" size="lg" onClick={() => setIsInviteOpen(true)}>
           <UserPlus size={18} />
           Invite New User
         </Button>
       </header>
 
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2.5rem] overflow-hidden shadow-sm">
-        
-        {/* Toolbar */}
-        <div className="p-6 md:px-8 md:py-6 border-b border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="w-full md:w-96">
-            <Input 
-              type="text" 
-              placeholder="Search by name or email..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              icon={Search}
-            />
-          </div>
-          <div className="flex gap-4 w-full md:w-auto items-center">
-            <div className="relative flex-1 md:flex-none">
-              <select 
-                value={roleFilter}
-                onChange={(e) => { setRoleFilter(e.target.value); setCurrentPage(1); }}
-                className="w-full px-6 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-200 dark:border-neutral-800 text-sm outline-none text-neutral-600 dark:text-neutral-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors appearance-none cursor-pointer pr-12 min-h-[44px]"
-              >
-                <option>All Roles</option>
-                <option>Student</option>
-                <option>Admin</option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" size={16} />
-            </div>
-            <Button variant="outline" className="hidden sm:flex items-center gap-2 whitespace-nowrap">
-              <Filter size={16} /> Advanced Filters
+      <DataTable
+        data={users}
+        columns={columns}
+        searchableKeys={["name", "email", "role", "status"]}
+        searchPlaceholder="Search by name, email, role, or status..."
+        filters={[
+          { key: "role", label: "Role", options: ["Student", "Intern", "Mentor", "Admin"], multiple: true },
+          { key: "status", label: "Status", options: ["Active", "Pending", "Suspended"], multiple: false },
+        ]}
+        bulkActions={[
+          { label: "Suspend", icon: Archive, variant: "outline", onClick: (ids, clearSelection) => {
+            setUsers((current) => current.map((user) => ids.includes(user.id) ? { ...user, status: "Suspended" } : user));
+            clearSelection([]);
+            toast.success("Selected users suspended.");
+          }},
+          { label: "Delete", icon: Trash2, variant: "danger", onClick: handleBulkDelete },
+        ]}
+        rowActions={(user) => (
+          <div className="relative inline-flex group/menu">
+            <Button variant="ghost" size="sm" className="px-2" aria-label={`Actions for ${user.name}`}>
+              <MoreVertical size={16} />
             </Button>
-          </div>
-        </div>
-
-        {/* Bulk Actions Banner */}
-        <AnimatePresence>
-          {selectedIds.length > 0 && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="bg-primary-50 dark:bg-primary-500/10 border-b border-primary-100 dark:border-primary-500/20 px-8 py-3 flex justify-between items-center overflow-hidden"
-            >
-              <span className="text-sm font-medium text-primary-600 dark:text-primary-400">{selectedIds.length} user(s) selected</span>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="bg-white text-xs gap-1 hidden sm:flex"><Download size={14}/> Export</Button>
-                <Button variant="outline" size="sm" className="bg-white text-xs gap-1"><Archive size={14}/> Suspend</Button>
-                <Button variant="danger" size="sm" className="text-xs gap-1" onClick={handleBulkDelete}><Trash2 size={14}/> Delete</Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left whitespace-nowrap">
-            <thead>
-              <tr className="bg-background-header dark:bg-neutral-800/30 border-b border-neutral-200 dark:border-neutral-800">
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 w-12">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500 w-4 h-4 cursor-pointer" 
-                    checked={currentRows.length > 0 && selectedIds.length === currentRows.length}
-                    onChange={toggleSelectAll}
-                  />
-                </th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 cursor-pointer hover:text-primary-500 transition-colors" onClick={() => handleSort('name')}>
-                  Learner {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 cursor-pointer hover:text-primary-500 transition-colors" onClick={() => handleSort('role')}>
-                  Role {sortConfig.key === 'role' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 cursor-pointer hover:text-primary-500 transition-colors" onClick={() => handleSort('joined')}>
-                  Joined {sortConfig.key === 'joined' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 cursor-pointer hover:text-primary-500 transition-colors" onClick={() => handleSort('status')}>
-                  Status {sortConfig.key === 'status' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
-                </th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-              {currentRows.map((user) => (
-                <motion.tr 
-                  layout
-                  key={user.id} 
-                  className={`hover:bg-primary-50 dark:hover:bg-neutral-800/40 transition-colors group ${selectedIds.includes(user.id) ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}
-                >
-                  <td className="px-8 py-6">
-                    <input 
-                      type="checkbox" 
-                      className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500 w-4 h-4 cursor-pointer"
-                      checked={selectedIds.includes(user.id)}
-                      onChange={() => toggleSelect(user.id)} 
-                    />
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-100 dark:border-secondary-900/30 flex items-center justify-center text-secondary-600 dark:text-secondary-400 font-bold text-sm shadow-sm">
-                        {user.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-neutral-900 dark:text-neutral-50 leading-none mb-1.5 group-hover:text-primary-600 transition-colors">{user.name}</p>
-                        <div className="flex items-center gap-1.5 text-neutral-400 text-xs">
-                          <Mail size={12} />
-                          {user.email}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2">
-                      {user.role === "Admin" ? (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary-50 dark:bg-secondary-500/10 border border-secondary-100 dark:border-secondary-500/20">
-                          <Shield size={14} className="text-secondary-600 dark:text-secondary-400" />
-                          <span className="text-[10px] font-bold text-secondary-600 dark:text-secondary-400 uppercase tracking-widest">{user.role}</span>
-                        </div>
-                      ) : (
-                        <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400 px-2">{user.role}</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                      <Calendar size={14} />
-                      {new Date(user.joined).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
-                      user.status === "Active" 
-                        ? "bg-status-success/10 text-status-success border-status-success/20"
-                        : "bg-status-error/10 text-status-error border-status-error/20"
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end gap-2 relative group/menu">
-                      <button className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800 hover:border-primary-500/50 hover:bg-primary-500/10 text-neutral-400 hover:text-primary-600 transition-all focus-visible:ring-2 focus-visible:ring-primary-500 outline-none">
-                        <MoreVertical size={16} />
-                      </button>
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 py-2 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10 origin-top-right transform scale-95 group-hover/menu:scale-100">
-                        <button className="w-full text-left px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2"><Edit2 size={14}/> Edit Profile</button>
-                        <button className="w-full text-left px-4 py-2 text-sm text-status-warning hover:bg-status-warning/10 flex items-center gap-2"><Archive size={14}/> Suspend User</button>
-                        <button className="w-full text-left px-4 py-2 text-sm text-status-error hover:bg-red-50 dark:hover:bg-red-900/10 flex items-center gap-2" onClick={() => handleDeleteUser(user.id)}><UserX size={14}/> Delete Account</button>
-                      </div>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-          
-          {filteredUsers.length === 0 && (
-            <div className="py-12 px-4">
-              <EmptyState 
-                title="No Users Found" 
-                desc="We couldn't find any users matching your current search or filters."
-                icon={Search}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Pagination Footer */}
-        {filteredUsers.length > 0 && (
-          <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4 bg-neutral-50/50 dark:bg-neutral-800/20">
-            <span className="text-sm text-neutral-500 dark:text-neutral-400">
-              Showing <span className="font-bold text-neutral-900 dark:text-neutral-100">{indexOfFirstRow + 1}</span> to <span className="font-bold text-neutral-900 dark:text-neutral-100">{Math.min(indexOfLastRow, filteredUsers.length)}</span> of <span className="font-bold text-neutral-900 dark:text-neutral-100">{filteredUsers.length}</span> users
-            </span>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</Button>
+            <div className="invisible absolute right-0 top-full z-20 mt-2 w-44 origin-top-right scale-95 rounded-lg border border-neutral-200 bg-white py-2 text-left opacity-0 shadow-overlay transition-all group-hover/menu:visible group-hover/menu:scale-100 group-hover/menu:opacity-100 dark:border-neutral-800 dark:bg-neutral-900">
+              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Eye size={14} /> View</button>
+              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Pencil size={14} /> Edit</button>
+              <button onClick={() => setDeleteTarget(user)} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-status-error hover:bg-status-error/10"><UserX size={14} /> Delete</button>
             </div>
           </div>
         )}
-      </div>
-    </motion.div>
+        emptyTitle="No users found"
+        emptyDescription="Clear filters or invite a new user to continue."
+      />
+
+      <Modal
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        title="Invite user"
+        description="Real-time validation helps admins correct fields before submit."
+        size="lg"
+        footer={(
+          <>
+            <Button variant="ghost" onClick={() => setIsInviteOpen(false)}>Cancel</Button>
+            <Button type="submit" form="invite-form" variant="primary" disabled={!canSubmit}>Send Invite</Button>
+          </>
+        )}
+      >
+        <form id="invite-form" onSubmit={handleInvite} className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <Input
+            label="Full name"
+            value={formData.name}
+            onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
+            isValid={nameValid}
+            error={formData.name && !nameValid ? "Name is required." : ""}
+            required
+          />
+          <Input
+            label="Email address"
+            type="email"
+            value={formData.email}
+            onChange={(event) => setFormData((current) => ({ ...current, email: event.target.value }))}
+            isValid={emailValid}
+            error={formData.email && !emailValid ? "Enter a valid email address." : ""}
+            required
+          />
+          <div>
+            <Input
+              label="Temporary password"
+              type="password"
+              value={formData.password}
+              onChange={(event) => setFormData((current) => ({ ...current, password: event.target.value }))}
+              isValid={passwordValid}
+              error={formData.password && !passwordValid ? "Use 8+ chars with upper, number, or symbol." : ""}
+              required
+            />
+            <div className="mt-2 grid grid-cols-4 gap-1" aria-label="Password strength">
+              {[1, 2, 3, 4].map((step) => (
+                <div key={step} className={`h-1.5 rounded-full ${passwordScore >= step ? step < 3 ? "bg-status-warning" : "bg-status-success" : "bg-neutral-200 dark:bg-neutral-800"}`} />
+              ))}
+            </div>
+          </div>
+          <Input
+            label="Cohort capacity"
+            type="number"
+            min="1"
+            max="500"
+            value={formData.cohortSize}
+            onChange={(event) => setFormData((current) => ({ ...current, cohortSize: event.target.value }))}
+            isValid={cohortValid}
+            error={formData.cohortSize && !cohortValid ? "Capacity must be between 1 and 500." : ""}
+            required
+          />
+          <div className="md:col-span-2">
+            <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Role</label>
+            <select
+              value={formData.role}
+              onChange={(event) => setFormData((current) => ({ ...current, role: event.target.value }))}
+              className="min-h-[44px] w-full rounded-lg border border-neutral-200 bg-white px-4 text-sm text-neutral-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50"
+            >
+              <option>Student</option>
+              <option>Intern</option>
+              <option>Mentor</option>
+              <option>Admin</option>
+            </select>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmationModal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          setUsers((current) => current.filter((user) => user.id !== deleteTarget.id));
+          toast.success("User deleted.");
+        }}
+        title="Delete user?"
+        message={`This removes ${deleteTarget?.name || "this user"} from the admin directory.`}
+        confirmText="Delete User"
+        isDanger
+      />
+    </div>
   );
 };
 

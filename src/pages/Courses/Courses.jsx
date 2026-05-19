@@ -66,7 +66,7 @@ const Courses = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               containerClassName="max-w-2xl mx-auto"
-              className="py-5 rounded-[2rem] text-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              className="py-5 text-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
             />
           </motion.div>
         </div>

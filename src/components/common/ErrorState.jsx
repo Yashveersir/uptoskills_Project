@@ -7,19 +7,19 @@ const ErrorState = ({
   onRetry 
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center px-6 bg-red-50/30 dark:bg-red-900/10 rounded-[2.5rem] border border-dashed border-red-200 dark:border-red-900/30">
-      <div className="w-16 h-16 bg-white dark:bg-neutral-800 rounded-2xl flex items-center justify-center text-red-500 shadow-sm mb-6 border border-red-100 dark:border-red-900/20">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-status-error/30 bg-status-error/5 px-6 py-16 text-center dark:bg-status-error/10">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg border border-status-error/20 bg-white text-status-error shadow-sm dark:bg-neutral-800">
         <AlertCircle size={32} strokeWidth={1.5} />
       </div>
-      <h2 className="text-xl font-display font-bold mb-2 text-neutral-900 dark:text-neutral-50">{title}</h2>
-      <p className="text-neutral-500 dark:text-neutral-400 max-w-sm text-sm mb-8 leading-relaxed">{message}</p>
+      <h2 className="mb-2 text-xl font-medium text-neutral-900 dark:text-neutral-50">{title}</h2>
+      <p className="mb-8 max-w-sm text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">{message}</p>
       
       {onRetry && (
         <Button 
           variant="outline" 
           size="sm" 
           onClick={onRetry}
-          className="gap-2 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:text-red-400 dark:hover:bg-red-900/20"
+          className="border-status-error/30 text-status-error hover:bg-status-error/10"
         >
           <RefreshCw size={16} />
           Try Again
