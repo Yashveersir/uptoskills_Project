@@ -12,8 +12,8 @@ Ensure you have the following installed:
 ### 2. Setup
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Yashveersir/uptoskills-_Project.git
-   cd uptoskills-_Project
+   git clone https://github.com/Yashveersir/uptoskills_Project.git
+   cd uptoskills_Project
    ```
 
 2. **Install dependencies:**
