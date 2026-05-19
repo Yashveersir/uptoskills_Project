@@ -1,0 +1,88 @@
+const courseData = [
+  {
+    id: 1,
+    title: "CSS Mastery: Modern Layouts and Animations",
+    teacher: "Shah Rukh Khan",
+    image: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Shah_Rukh_Khan_graces_the_launch_of_the_new_Santro.jpg",
+    description: "Master modern CSS techniques including Flexbox, Grid, and advanced animations. Learn to build responsive, beautiful websites with AI celebrity-style guidance and King Khan's flair.",
+    rating: 4.9,
+    reviews: "2.4k",
+    duration: "6.5 Hours",
+    students: "15,240",
+    level: "Intermediate",
+    category: "Design",
+    type: "Course"
+  },
+  {
+    id: 2,
+    title: "Python for Data Science: From Zero to Hero",
+    teacher: "Alia Bhatt",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Alia_Bhatt_at_Berlinale_2022_Ausschnitt.jpg/960px-Alia_Bhatt_at_Berlinale_2022_Ausschnitt.jpg",
+    description: "Deep dive into Python programming with a focus on data analysis and visualization. Master NumPy, Pandas, and Matplotlib step by step with Alia's fresh perspective.",
+    rating: 4.8,
+    reviews: "1.8k",
+    duration: "10 Hours",
+    students: "12,100",
+    level: "Beginner",
+    category: "Development",
+    type: "Course"
+  },
+  {
+    id: 3,
+    title: "Full-Stack MERN: Build Real World Apps",
+    teacher: "Akshay Kumar",
+    image: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Akshay_Kumar_National_Award_for_Padman_%28cropped%29.jpg",
+    description: "Comprehensive guide to MongoDB, Express, React, and Node.js. Become a full-stack developer with Khiladi Kumar's discipline and build industry-grade applications.",
+    rating: 4.7,
+    reviews: "3.2k",
+    duration: "25 Hours",
+    students: "22,500",
+    level: "Advanced",
+    category: "Development",
+    type: "Learning Path"
+  },
+  {
+    id: 4,
+    title: "React Advanced: Patterns and Performance",
+    teacher: "Virat Kohli",
+    image: "https://i.pinimg.com/736x/ac/16/c7/ac16c75b4c234b0c0f99f3059ff3e067.jpg",
+    description: "Optimize your React applications for maximum performance. Learn about hooks, suspense, and concurrent mode explained with King Kohli's focus and precision.",
+    rating: 4.9,
+    reviews: "1.5k",
+    duration: "8 Hours",
+    students: "8,900",
+    level: "Advanced",
+    category: "Development",
+    type: "Course"
+  },
+  {
+    id: 5,
+    title: "JavaScript Pro: Mastering the Core Engine",
+    teacher: "MS Dhoni",
+    image: "https://i.pinimg.com/736x/26/71/34/26713485846abc45b5467c68e0f5ebb6.jpg",
+    description: "Deep dive into JavaScript engines, closures, and asynchronous patterns with Captain Cool's precision. Master the language that powers the modern web.",
+    rating: 5.0,
+    reviews: "4.1k",
+    duration: "12 Hours",
+    students: "30,100",
+    level: "Intermediate",
+    category: "Development",
+    type: "Learning Path"
+  },
+  {
+    id: 6,
+    title: "UI/UX Design: Principles and Prototyping",
+    teacher: "Deepika Padukone",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Deepika_Padukone_2025_%281%29.png/500px-Deepika_Padukone_2025_%281%29.png",
+    description: "Design modern, user-centric UI/UX with Deepika's elegant aesthetic. Learn color theory, typography, and advanced prototyping in Figma and Adobe XD.",
+    rating: 4.8,
+    reviews: "2.1k",
+    duration: "7 Hours",
+    students: "11,400",
+    level: "Beginner",
+    category: "Design",
+    type: "Course"
+  },
+];
+
+export default courseData;
