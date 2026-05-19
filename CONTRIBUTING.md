@@ -1,77 +1,96 @@
 # Contributing to UpToSkills Project
 
-Welcome to the team! This guide will help you get started with the project and outline our workflow for collaboration.
+Welcome! This guide provides a detailed, step-by-step walkthrough for setting up the project and collaborating with the team.
 
-## 🚀 Getting Started
+---
 
-### 1. Prerequisites
-Ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (Latest LTS version recommended)
-- [Git](https://git-scm.com/)
+## 🚀 Phase 1: Local Setup
 
-### 2. Setup
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Yashveersir/uptoskills_Project.git
-   cd uptoskills_Project
-   ```
+Follow these steps to get the project running on your machine.
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Variables:**
-   Create a `.env` file in the root directory and add any necessary environment variables. (Ask the project lead for the current keys).
-
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
-
-## 🛠 Workflow
-
-### 1. Branching Strategy
-We use a feature-branch workflow. Never work directly on the `main` branch.
-
-- **Feature branches:** `feature/short-description`
-- **Bug fixes:** `fix/short-description`
-- **Hotfixes:** `hotfix/description`
-
-To create a new branch:
+### Step 1: Clone the Repository
+Download the project code from GitHub to your local computer.
 ```bash
-git checkout -b feature/your-feature-name
+git clone https://github.com/Yashveersir/uptoskills_Project.git
+cd uptoskills_Project
 ```
+*   **What this does:** `git clone` creates a copy of the repository. `cd` moves you into the project folder.
 
-### 2. Pulling Updates
-Before starting any work, ensure your local `main` branch is up to date:
+### Step 2: Install Dependencies
+Install all the necessary libraries and packages defined in `package.json`.
+```bash
+npm install
+```
+*   **What this does:** This command reads the `package.json` file and downloads all required libraries into a `node_modules` folder.
+
+### Step 3: Configure Environment Variables
+The application needs certain "secrets" or configuration keys to run (like API URLs).
+1.  Create a new file named `.env` in the root directory.
+2.  Ask the project lead for the current environment variables and paste them there.
+*   **Why?** We don't commit `.env` files to GitHub for security reasons.
+
+### Step 4: Start the Development Server
+Launch the application locally to see your changes in real-time.
+```bash
+npm run dev
+```
+*   **What this does:** This starts the Vite development server. It will usually give you a link (like `http://localhost:5173`) to view the app in your browser.
+
+---
+
+## 🛠 Phase 2: Collaboration Workflow
+
+We use a **Branching Strategy** to ensure the main code stays stable.
+
+### 1. Update your local code
+Before starting new work, always get the latest changes from the team.
 ```bash
 git checkout main
 git pull origin main
 ```
+*   **git checkout main:** Switches you to the main branch.
+*   **git pull origin main:** Downloads and merges the latest changes from GitHub.
 
-### 3. Committing Changes
-Use descriptive commit messages:
+### 2. Create a Feature Branch
+Never work directly on `main`. Create a "sandbox" for your changes.
+```bash
+git checkout -b feature/your-feature-name
+```
+*   **What this does:** Creates a new branch and switches you to it immediately. Use descriptive names like `feature/login-ui` or `fix/header-mobile`.
+
+### 3. Save your work (Commit)
+As you write code, save snapshots of your progress.
 ```bash
 git add .
-git commit -m "feat: add user profile section"
+git commit -m "feat: add descriptive message"
 ```
+*   **git add .:** Stages all your changes, telling Git which files you want to include in the snapshot.
+*   **git commit -m "..."**: Saves the staged changes with a message. A good message explains *what* changed (e.g., `feat: add search bar to courses page`).
 
-### 4. Pushing and Pull Requests
-1. Push your branch to GitHub:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-2. Go to the repository on GitHub and open a **Pull Request (PR)**.
-3. Wait for at least one team member to review and approve your changes before merging.
+### 4. Share your work (Push)
+Upload your branch to GitHub so others can see it.
+```bash
+git push origin feature/your-feature-name
+```
+*   **What this does:** Sends your local branch to the GitHub server.
+
+### 5. Open a Pull Request (PR)
+1.  Go to the [GitHub Repository](https://github.com/Yashveersir/uptoskills_Project).
+2.  You will see a "Compare & pull request" button for your branch. Click it.
+3.  Describe what you did and submit it.
+4.  **Review:** A team member will review your code. Once approved, it can be merged into the `main` branch.
+
+---
 
 ## 🎨 Coding Standards
-- Follow the existing folder structure.
-- Use functional components and hooks for React.
-- Ensure all components are responsive using Tailwind CSS.
-- Run `npm run lint` before committing to ensure code quality.
+*   **Framework:** React (Functional Components + Hooks).
+*   **Styling:** Tailwind CSS (Mobile-first approach).
+*   **Consistency:** Follow the existing folder structure in `src/`.
+*   **Verification:** Run `npm run lint` before pushing to check for errors.
 
-## 💬 Communication
-If you have questions or need help, reach out on our project communication channel.
+---
+
+## ❓ Need Help?
+If you're stuck, reach out on our project's communication channel or open an issue on GitHub. 
 
 Happy coding!
