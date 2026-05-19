@@ -97,19 +97,23 @@ const AdminCourses = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-neutral-50/50 dark:bg-neutral-800/30">
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">Course Content</th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">AI Mentor</th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">Enrollment</th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">Status</th>
-                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 text-right">Actions</th>
+              <tr className="bg-background-header dark:bg-neutral-800/30">
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 w-12">
+                  <input type="checkbox" className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500" />
+                </th>
+                <th className="px-4 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Course Content</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">AI Mentor</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 cursor-pointer hover:text-neutral-700">Enrollment ↕</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Status</th>
+                <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
               {loading ? (
                 [1,2,3,4,5].map(i => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-8 py-6 flex items-center gap-4">
+                    <td className="px-8 py-6"><div className="w-4 h-4 bg-neutral-100 dark:bg-neutral-800 rounded" /></td>
+                    <td className="px-4 py-6 flex items-center gap-4">
                       <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-800 rounded-xl" />
                       <div className="space-y-2">
                         <div className="h-4 w-48 bg-neutral-100 dark:bg-neutral-800 rounded" />
@@ -123,8 +127,11 @@ const AdminCourses = () => {
                   </tr>
                 ))
               ) : filteredCourses.map((course) => (
-                <motion.tr layout key={course.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors group">
+                <motion.tr layout key={course.id} className="hover:bg-primary-50 dark:hover:bg-neutral-800/40 transition-colors group">
                   <td className="px-8 py-6">
+                    <input type="checkbox" className="rounded border-neutral-300 text-primary-500 focus:ring-primary-500" />
+                  </td>
+                  <td className="px-4 py-6">
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <img 
@@ -182,8 +189,15 @@ const AdminCourses = () => {
             </tbody>
           </table>
           {filteredCourses.length === 0 && !loading && (
-            <div className="py-24 text-center">
-              <p className="text-neutral-400 text-sm italic">No courses found matching your search.</p>
+            <div className="py-24 flex flex-col items-center justify-center text-center">
+              <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-full mb-4">
+                <BookOpen size={48} className="text-neutral-400" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-50 mb-2">No Courses Found</h3>
+              <p className="text-neutral-500 dark:text-neutral-400 mb-6 max-w-md">We couldn't find any courses matching your current filters or search query. Try adjusting them or create a new course.</p>
+              <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+                + Create Course
+              </Button>
             </div>
           )}
         </div>
@@ -215,24 +229,36 @@ const AdminCourses = () => {
                 </div>
 
                 <form onSubmit={handleCreateCourse} className="space-y-6">
-                  <Input 
-                    required
-                    label="Course Title"
-                    type="text" 
-                    placeholder="e.g. Mastering Modern Frontend"
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  />
+                  <div className="relative">
+                    <Input 
+                      required
+                      label="Course Title"
+                      type="text" 
+                      placeholder="e.g. Mastering Modern Frontend"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      className={formData.title.length > 0 ? "border-status-success" : ""}
+                    />
+                    {formData.title.length > 0 && (
+                      <CheckCircle2 className="absolute right-4 top-[2.4rem] text-status-success" size={18} />
+                    )}
+                    {formData.title.length === 0 && (
+                       <p className="text-xs text-status-error mt-1 ml-1 flex items-center gap-1"><AlertCircle size={12}/> Title is required</p>
+                    )}
+                  </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-3 ml-1">Curriculum Overview</label>
+                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-3 ml-1">Curriculum Overview <span className="text-status-error">*</span></label>
                     <textarea 
                       required
                       placeholder="What will students learn in this course?"
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-200 dark:border-neutral-800 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400 h-32 resize-none"
+                      className={`w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950/50 border focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all text-neutral-900 dark:text-neutral-50 placeholder:text-neutral-400 h-32 resize-none ${formData.description.length > 10 ? 'border-status-success' : 'border-neutral-200 dark:border-neutral-800'}`}
                     />
+                     {formData.description.length > 0 && formData.description.length <= 10 && (
+                       <p className="text-xs text-status-error mt-1 ml-1 flex items-center gap-1"><AlertCircle size={12}/> Description must be at least 10 characters</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

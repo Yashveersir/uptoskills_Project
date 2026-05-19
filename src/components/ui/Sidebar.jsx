@@ -78,13 +78,13 @@ const Sidebar = ({ menuItems = [], baseTitle = "Panel", exitPath = "/" }) => {
                 <Link
                   key={item.label}
                   to={item.path}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all relative group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 outline-none ${
                     isActive 
-                      ? "bg-primary-50 text-primary-600 dark:bg-primary-500/10" 
+                      ? "bg-primary-500 text-white dark:bg-primary-500/20 dark:text-primary-400 shadow-md shadow-primary-500/20 dark:shadow-none" 
                       : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-50"
                   }`}
                 >
-                  <div className={`${isActive ? "text-primary-600" : "text-neutral-400 group-hover:text-primary-600"}`}>
+                  <div className={`${isActive ? "text-white dark:text-primary-400" : "text-neutral-400 group-hover:text-primary-600"}`}>
                     {item.icon}
                   </div>
                   
@@ -95,7 +95,7 @@ const Sidebar = ({ menuItems = [], baseTitle = "Panel", exitPath = "/" }) => {
                   {isActive && !isCollapsed && (
                     <motion.div 
                       layoutId="active-pill"
-                      className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-600" 
+                      className="ml-auto w-1.5 h-1.5 rounded-full bg-white dark:bg-primary-400" 
                     />
                   )}
 

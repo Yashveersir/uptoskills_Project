@@ -9,30 +9,42 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          DEFAULT: '#FF6B35', // UptoSkills Orange
+          50: '#fff5f0',
+          100: '#ffe8db',
+          200: '#ffd0b8',
+          300: '#ffaf8a',
+          400: '#ff8452',
+          500: '#ff6b35', // Base primary
+          600: '#eb4a0f',
+          700: '#c23405',
+          800: '#9a2a0a',
+          900: '#7e260c',
+          950: '#441004',
         },
-        accent: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-          950: '#431407',
+        secondary: {
+          DEFAULT: '#00B5A5', // UptoSkills Teal
+          50: '#f0fdfb',
+          100: '#ccfbf4',
+          200: '#9af5e8',
+          300: '#5decd7',
+          400: '#2cd9c4',
+          500: '#00b5a5', // Base secondary
+          600: '#009a8e',
+          700: '#007b73',
+          800: '#00625d',
+          900: '#00514e',
+          950: '#002f2e',
+        },
+        status: {
+          success: '#10B981', // green
+          warning: '#F59E0B', // amber
+          error: '#EF4444',   // red
+          info: '#3B82F6',    // blue
+        },
+        background: {
+          light: '#F9F8F6',
+          header: '#F3F1ED',
         },
         neutral: {
           50: '#f8fafc',
