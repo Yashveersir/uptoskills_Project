@@ -44,7 +44,7 @@ const Courses = () => {
 
       {/* ================= HERO ================= */}
       <div className="relative pt-32 pb-20 px-6 overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_70%)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,107,53,0.05),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(255,107,53,0.1),transparent_70%)]" />
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -52,7 +52,7 @@ const Courses = () => {
             className="max-w-3xl mx-auto"
           >
             <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 text-neutral-900 dark:text-neutral-50 tracking-tight">
-              Master Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-orange-400">Future</span>
+              Master Your <span className="text-primary-500">Future</span>
             </h1>
 
             <p className="text-neutral-500 dark:text-neutral-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
@@ -66,7 +66,7 @@ const Courses = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               containerClassName="max-w-2xl mx-auto"
-              className="py-5 rounded-[2rem] text-lg shadow-soft"
+              className="py-5 rounded-[2rem] text-lg shadow-sm focus:ring-primary-500 focus:border-primary-500"
             />
           </motion.div>
         </div>
@@ -81,10 +81,10 @@ const Courses = () => {
               <button
                 key={tab.name}
                 onClick={() => setActiveTab(tab.name)}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-primary-500 outline-none ${
                   activeTab === tab.name 
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-neutral-900 dark:text-neutral-50 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700" 
-                    : "text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-900 dark:text-neutral-50"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-neutral-200 dark:ring-neutral-700" 
+                    : "text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-50"
                 }`}
               >
                 <tab.icon size={16} />
@@ -100,10 +100,10 @@ const Courses = () => {
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all font-bold text-sm ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all font-bold text-sm focus-visible:ring-2 focus-visible:ring-primary-500 outline-none ${
                 showFilters 
-                  ? "bg-neutral-900 text-white border-neutral-900 dark:bg-white dark:text-neutral-900 dark:border-white" 
-                  : "bg-transparent text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
+                  ? "bg-primary-500 text-white border-primary-500 dark:bg-primary-500 dark:text-white dark:border-primary-500" 
+                  : "bg-transparent text-neutral-600 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:border-primary-500 dark:hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
               }`}
             >
               <Filter size={16} />
@@ -130,10 +130,10 @@ const Courses = () => {
                       <button
                         key={level}
                         onClick={() => setSelectedLevel(level)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all focus-visible:ring-2 focus-visible:ring-primary-500 outline-none ${
                           selectedLevel === level 
                             ? "bg-primary-50 border-primary-200 text-primary-600 dark:bg-primary-500/10 dark:border-primary-500/30 dark:text-primary-400" 
-                            : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:border-neutral-300 dark:hover:border-neutral-700"
+                            : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400"
                         }`}
                       >
                         {level}
@@ -149,10 +149,10 @@ const Courses = () => {
                       <button
                         key={category}
                         onClick={() => setSelectedCategory(category)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all focus-visible:ring-2 focus-visible:ring-primary-500 outline-none ${
                           selectedCategory === category 
                             ? "bg-primary-50 border-primary-200 text-primary-600 dark:bg-primary-500/10 dark:border-primary-500/30 dark:text-primary-400" 
-                            : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:border-neutral-300 dark:hover:border-neutral-700"
+                            : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-600 dark:hover:text-primary-400"
                         }`}
                       >
                         {category}
@@ -186,18 +186,22 @@ const Courses = () => {
                   setSelectedLevel("All Levels");
                   setSelectedCategory("All Categories");
                 }}
-                className="text-primary-600 font-bold hover:underline transition-all text-sm"
+                className="text-primary-600 font-bold hover:underline transition-all text-sm focus-visible:ring-2 focus-visible:ring-primary-500 outline-none rounded"
               >
                 Reset all filters
               </button>
             }
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
             {filteredCourses.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
