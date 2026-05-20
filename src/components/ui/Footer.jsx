@@ -1,9 +1,31 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import Input from "../common/Input";
+import toast from "react-hot-toast";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateAndSubmit = (e) => {
+    e.preventDefault();
+    setEmailError("");
+
+    if (!email.trim()) {
+      setEmailError("Please enter your email address.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+
+    toast.success("Thanks for joining our learning community!");
+    setEmail("");
+  };
 
   const footerLinks = {
     platform: [
@@ -47,15 +69,22 @@ const Footer = () => {
             
             <div className="flex flex-col gap-3 max-w-sm">
               <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Join our learning community</p>
-              <div className="flex gap-2">
+              <form onSubmit={validateAndSubmit} className="flex gap-2">
                 <div className="flex-1">
                   <Input 
                     type="email" 
                     placeholder="Email address"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError("");
+                    }}
+                    error={emailError}
+                    containerClassName="!mb-0"
                   />
                 </div>
-                <Button variant="primary" size="sm" className="rounded-xl">Join</Button>
-              </div>
+                <Button variant="primary" size="sm" className="rounded-xl" type="submit">Join</Button>
+              </form>
             </div>
           </div>
 

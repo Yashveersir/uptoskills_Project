@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Button from "../components/common/Button";
+import { ArrowLeft, Home } from "lucide-react";
 
 const NotFound = () => {
   return (
@@ -22,11 +23,21 @@ const NotFound = () => {
           The module or lesson you're looking for doesn't exist. Our AI couldn't synthesize this page for you.
         </p>
 
-        <Link to="/" className="relative z-10">
-          <Button variant="primary" size="lg" className="px-10">
-            Return to Learning
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+          <Link to="/">
+            <Button variant="primary" size="lg" className="px-10">
+              <Home size={18} className="mr-2" />
+              Return to Learning
+            </Button>
+          </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+          >
+            <ArrowLeft size={16} />
+            Go Back
+          </button>
+        </div>
       </motion.div>
     </div>
   );

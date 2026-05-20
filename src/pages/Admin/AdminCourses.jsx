@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AlertCircle, CheckCircle2, Eye, Image as ImageIcon, MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
-import { getCourses } from "../../api/courseApi";
-import { mentors } from "../../constants/mentorData";
+import { getAdminCourses, createCourse, deleteCourse, updateCourse, updateCourseStatus, getMentors } from "../../api";
 import Button from "../../components/common/Button";
 import DataTable from "../../components/common/DataTable";
 import ErrorState from "../../components/common/ErrorState";
@@ -12,31 +12,46 @@ import ConfirmationModal from "../../components/common/ConfirmationModal";
 import { adminClasses } from "../../designTokens";
 
 const AdminCourses = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState(null); // null = create, object = edit
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     image: "",
-    teacherId: mentors[0].id,
+    teacherId: "",
     enrollmentLimit: "500",
   });
+  const [mentorsList, setMentorsList] = useState([]);
+
+  const openCreateModal = () => {
+    setEditTarget(null);
+    setFormData({ title: "", description: "", image: "", teacherId: "", enrollmentLimit: "500" });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (course) => {
+    setEditTarget(course);
+    setFormData({
+      title: course.title || "",
+      description: course.description || "",
+      image: course.image || "",
+      teacherId: course.teacherId || "",
+      enrollmentLimit: course.enrollmentLimit?.toString() || "500",
+    });
+    setIsModalOpen(true);
+  };
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     setError(false);
     try {
-      const data = await getCourses();
-      setCourses(data.map((course, index) => ({
-        ...course,
-        id: course.id || index + 1,
-        status: index % 3 === 0 ? "Pending" : "Live",
-        category: index % 2 === 0 ? "Development" : "Career",
-        enrollment: Math.floor(Math.random() * 5000),
-      })));
+      const data = await getAdminCourses();
+      setCourses(data);
     } catch (err) {
       console.error("Course load failed:", err);
       setError(true);
@@ -46,8 +61,16 @@ const AdminCourses = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCourses();
+    const fetchMentors = async () => {
+      try {
+        const data = await getMentors();
+        setMentorsList(data);
+      } catch (err) {
+        console.error("Failed to load mentors:", err);
+      }
+    };
+    fetchMentors();
   }, [fetchCourses]);
 
   const titleValid = formData.title.trim().length >= 3;
@@ -56,32 +79,98 @@ const AdminCourses = () => {
   const enrollmentValid = Number.isFinite(enrollmentNumber) && enrollmentNumber >= 10 && enrollmentNumber <= 10000;
   const canSubmit = titleValid && descriptionValid && enrollmentValid;
 
-  const handleCreateCourse = (event) => {
+  const handleCreateCourse = async (event) => {
     event.preventDefault();
     if (!canSubmit) return;
 
-    const selectedMentor = mentors.find((mentor) => mentor.id === formData.teacherId);
-    const newCourse = {
-      id: Date.now(),
-      title: formData.title,
-      description: formData.description,
-      image: formData.image,
-      teacher: selectedMentor.name,
-      status: "Live",
-      category: "Development",
-      enrollment: 0,
-    };
+    if (editTarget) {
+      try {
+        const updatedCourse = await updateCourse(editTarget.id, {
+          title: formData.title,
+          description: formData.description,
+          image: formData.image,
+          mentorId: formData.teacherId ? Number(formData.teacherId) : null,
+          enrollmentLimit: Number(formData.enrollmentLimit),
+        });
+        setCourses((current) =>
+          current.map((c) =>
+            c.id === editTarget.id
+              ? { ...c, ...updatedCourse }
+              : c
+          )
+        );
+        setIsModalOpen(false);
+        setEditTarget(null);
+        toast.success("Course updated successfully.");
+      } catch (err) {
+        console.error("Update course failed:", err);
+        toast.error(err.response?.data?.error || "Failed to update course.");
+      }
+      return;
+    }
 
-    setCourses((current) => [newCourse, ...current]);
-    setFormData({ title: "", description: "", image: "", teacherId: mentors[0].id, enrollmentLimit: "500" });
-    setIsModalOpen(false);
-    toast.success("Course created successfully.");
+    try {
+      const newCourse = await createCourse({
+        title: formData.title,
+        description: formData.description,
+        image: formData.image,
+        mentorId: formData.teacherId ? Number(formData.teacherId) : null,
+        enrollmentLimit: Number(formData.enrollmentLimit),
+      });
+
+      const matchedMentor = mentorsList.find(m => m.id === Number(formData.teacherId));
+
+      setCourses((current) => [{
+        ...newCourse,
+        status: "Live",
+        category: "Development",
+        rating: 4.8,
+        reviews: "0",
+        students: "0",
+        teacher: matchedMentor ? matchedMentor.name : "Admin",
+      }, ...current]);
+
+      setFormData({ title: "", description: "", image: "", teacherId: "", enrollmentLimit: "500" });
+      setIsModalOpen(false);
+      toast.success("Course created successfully.");
+    } catch (err) {
+      console.error("Create course failed:", err);
+      toast.error("Failed to create course.");
+    }
   };
 
-  const handleBulkDelete = (ids, clearSelection) => {
-    setCourses((current) => current.filter((course) => !ids.includes(course.id)));
-    clearSelection([]);
-    toast.success("Selected courses deleted.");
+  const handleBulkDelete = async (ids, clearSelection) => {
+    try {
+      await Promise.all(ids.map((id) => deleteCourse(id)));
+      setCourses((current) => current.filter((course) => !ids.includes(course.id)));
+      clearSelection([]);
+      toast.success("Selected courses deleted.");
+    } catch (err) {
+      console.error("Bulk delete failed:", err);
+      toast.error("Failed to delete courses.");
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    try {
+      await deleteCourse(deleteTarget.id);
+      setCourses((current) => current.filter((course) => course.id !== deleteTarget.id));
+      toast.success("Course deleted.");
+    } catch (err) {
+      console.error("Delete course failed:", err);
+      toast.error("Failed to delete course.");
+    }
+  };
+
+  const handleApproveCourse = async (courseId) => {
+    try {
+      await updateCourseStatus(courseId, true);
+      setCourses((current) => current.map((item) => item.id === courseId ? { ...item, status: "Live" } : item));
+      toast.success("Course approved.");
+    } catch (err) {
+      console.error("Approve course failed:", err);
+      toast.error("Failed to approve course.");
+    }
   };
 
   const columns = useMemo(() => [
@@ -103,8 +192,8 @@ const AdminCourses = () => {
         </div>
       ),
     },
-    { key: "teacher", header: "Mentor", sortable: true },
-    { key: "enrollment", header: "Enrollments", sortable: true, render: (course) => course.enrollment.toLocaleString() },
+    { key: "teacher", header: "Mentor", sortable: true, render: (course) => course.teacher || "Admin" },
+    { key: "students", header: "Enrollments", sortable: true, render: (course) => course.students || "0" },
     {
       key: "status",
       header: "Status",
@@ -129,7 +218,7 @@ const AdminCourses = () => {
           <h1 className={`${adminClasses.heading} mt-2`}>Course Management</h1>
           <p className={`${adminClasses.body} mt-2`}>Review, approve, and organize learning content.</p>
         </div>
-        <Button variant="primary" size="lg" onClick={() => setIsModalOpen(true)}>
+        <Button variant="primary" size="lg" onClick={openCreateModal}>
           <Plus size={18} />
           New Course
         </Button>
@@ -153,14 +242,11 @@ const AdminCourses = () => {
               <MoreVertical size={16} />
             </Button>
             <div className="invisible absolute right-0 top-full z-20 mt-2 w-44 origin-top-right scale-95 rounded-lg border border-neutral-200 bg-white py-2 text-left opacity-0 shadow-overlay transition-all group-hover/menu:visible group-hover/menu:scale-100 group-hover/menu:opacity-100 dark:border-neutral-800 dark:bg-neutral-900">
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Eye size={14} /> View</button>
-              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Pencil size={14} /> Edit</button>
+              <button onClick={() => navigate(`/courses/${course.id}`)} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Eye size={14} /> View</button>
+              <button onClick={() => openEditModal(course)} className="flex w-full items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"><Pencil size={14} /> Edit</button>
               {course.status === "Pending" && (
                 <button
-                  onClick={() => {
-                    setCourses((current) => current.map((item) => item.id === course.id ? { ...item, status: "Live" } : item));
-                    toast.success("Course approved.");
-                  }}
+                  onClick={() => handleApproveCourse(course.id)}
                   className="flex w-full items-center gap-2 px-4 py-2 text-sm text-status-success hover:bg-status-success/10"
                 >
                   <CheckCircle2 size={14} /> Approve
@@ -177,14 +263,14 @@ const AdminCourses = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Create course"
-        description="Add a production-ready course with validated fields."
+        onClose={() => { setIsModalOpen(false); setEditTarget(null); }}
+        title={editTarget ? "Edit Course" : "Create course"}
+        description={editTarget ? "Update course details below." : "Add a production-ready course with validated fields."}
         size="lg"
         footer={(
           <>
-            <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button type="submit" form="course-form" variant="primary" disabled={!canSubmit}>Launch Course</Button>
+            <Button variant="ghost" onClick={() => { setIsModalOpen(false); setEditTarget(null); }}>Cancel</Button>
+            <Button type="submit" form="course-form" variant="primary" disabled={!canSubmit}>{editTarget ? "Save Changes" : "Launch Course"}</Button>
           </>
         )}
       >
@@ -222,7 +308,12 @@ const AdminCourses = () => {
               onChange={(event) => setFormData((current) => ({ ...current, teacherId: event.target.value }))}
               className="min-h-[44px] w-full rounded-lg border border-neutral-200 bg-white px-4 text-sm text-neutral-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-50"
             >
-              {mentors.map((mentor) => <option key={mentor.id} value={mentor.id}>{mentor.name}</option>)}
+              <option value="">No Mentor (Admin)</option>
+              {mentorsList.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.role})
+                </option>
+              ))}
             </select>
           </div>
           <Input
@@ -242,10 +333,7 @@ const AdminCourses = () => {
       <ConfirmationModal
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          setCourses((current) => current.filter((course) => course.id !== deleteTarget.id));
-          toast.success("Course deleted.");
-        }}
+        onConfirm={handleDeleteCourse}
         title="Delete course?"
         message={`This will remove ${deleteTarget?.title || "this course"} from the admin catalog.`}
         confirmText="Delete Course"

@@ -4,7 +4,7 @@ import { logout } from "../../store/slices/authSlice";
 import Button from "../common/Button";
 import ThemeToggle from "../common/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, User, LogOut, BookOpen, Settings, LayoutDashboard } from "lucide-react";
+import { ChevronDown, User, LogOut, BookOpen, Settings, LayoutDashboard, Menu, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 const Navbar = () => {
@@ -13,6 +13,7 @@ const Navbar = () => {
   const location = useLocation();
   const [isExploreOpen, setIsExploreOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const exploreRef = useRef(null);
   const profileRef = useRef(null);
 
@@ -30,6 +31,11 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -51,165 +57,270 @@ const Navbar = () => {
     { label: "UI/UX Design", icon: <BookOpen size={16} /> },
   ];
 
+  const mobileMenuItems = [
+    { label: "Home", path: "/" },
+    { label: "Courses", path: "/courses" },
+    ...(isAuthenticated ? [
+      { label: "Dashboard", path: role === "admin" ? "/admin" : "/dashboard" },
+      { label: "Settings", path: role === "admin" ? "/admin/settings" : "/dashboard/settings" },
+    ] : [
+      { label: "Login", path: "/login" },
+      { label: "Get Started", path: "/register" },
+    ]),
+  ];
+
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-        
-        {/* Logo */}
-        <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-indigo-500 to-orange-400 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 transition-transform group-hover:rotate-12">
-              <span className="text-white font-bold text-lg">A</span>
-            </div>
-            <h1 className="text-xl font-display font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-              AI <span className="text-primary-600">Learn</span>
-            </h1>
-          </Link>
+    <>
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+          
+          {/* Logo */}
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 via-indigo-500 to-orange-400 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 transition-transform group-hover:rotate-12">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <h1 className="text-xl font-display font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                AI <span className="text-primary-600">Learn</span>
+              </h1>
+            </Link>
 
-          {/* Explore Dropdown */}
-          <div className="hidden lg:block relative" ref={exploreRef}>
-            <button 
-              onClick={() => setIsExploreOpen(!isExploreOpen)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                isExploreOpen 
-                  ? "bg-primary-50 text-primary-600 dark:bg-primary-500/10" 
-                  : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-              }`}
-            >
-              Explore
-              <ChevronDown size={16} className={`transition-transform duration-300 ${isExploreOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            <AnimatePresence>
-              {isExploreOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-2 overflow-hidden"
-                >
-                  <div className="p-3 text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 px-4">
-                    Top Categories
-                  </div>
-                  {exploreCategories.map((cat) => (
-                    <button
-                      key={cat.label}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-left"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-primary-600">
-                        {cat.icon}
-                      </div>
-                      {cat.label}
-                    </button>
-                  ))}
-                  <div className="mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
-                    <Link 
-                      to="/courses" 
-                      onClick={() => setIsExploreOpen(false)}
-                      className="block px-4 py-3 text-center text-sm font-semibold text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-xl transition-colors"
-                    >
-                      View All Courses
-                    </Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* Navigation Links */}
-        <div className="flex gap-4 items-center">
-          <div className="hidden md:flex gap-2 mr-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                  location.pathname === link.path 
+            {/* Explore Dropdown (Desktop only) */}
+            <div className="hidden lg:block relative" ref={exploreRef}>
+              <button 
+                onClick={() => setIsExploreOpen(!isExploreOpen)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                  isExploreOpen 
                     ? "bg-primary-50 text-primary-600 dark:bg-primary-500/10" 
-                    : "text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-neutral-50"
+                    : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                 }`}
               >
-                {link.label}
-              </Link>
-            ))}
+                Explore
+                <ChevronDown size={16} className={`transition-transform duration-300 ${isExploreOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              <AnimatePresence>
+                {isExploreOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-2 overflow-hidden"
+                  >
+                    <div className="p-3 text-[10px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 px-4">
+                      Top Categories
+                    </div>
+                    {exploreCategories.map((cat) => (
+                      <button
+                        key={cat.label}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-left"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-primary-600">
+                          {cat.icon}
+                        </div>
+                        {cat.label}
+                      </button>
+                    ))}
+                    <div className="mt-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+                      <Link 
+                        to="/courses" 
+                        onClick={() => setIsExploreOpen(false)}
+                        className="block px-4 py-3 text-center text-sm font-semibold text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-xl transition-colors"
+                      >
+                        View All Courses
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
-          <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block mx-2" />
-
-          {/* Theme Toggle & Auth */}
-          <div className="flex gap-3 items-center">
-            <ThemeToggle />
-            
-            {isAuthenticated ? (
-              <div className="relative" ref={profileRef}>
-                <button 
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 overflow-hidden border-2 border-transparent hover:border-primary-500 transition-all"
+          {/* Desktop Navigation Links */}
+          <div className="flex gap-4 items-center">
+            <div className="hidden md:flex gap-2 mr-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                    location.pathname === link.path 
+                      ? "bg-primary-50 text-primary-600 dark:bg-primary-500/10" 
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-neutral-50"
+                  }`}
                 >
-                  <User size={20} />
-                </button>
-
-                <AnimatePresence>
-                  {isProfileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-2 overflow-hidden"
-                    >
-                      <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 mb-2">
-                        <p className="text-sm font-bold text-neutral-900 dark:text-neutral-50 truncate">
-                          {user?.name || "Learner Account"}
-                        </p>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
-                          {user?.email || (role === "admin" ? "Administrator" : "Student")}
-                        </p>
-                      </div>
-
-                      <Link 
-                        to={role === "admin" ? "/admin" : "/dashboard"}
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                      >
-                        <LayoutDashboard size={16} />
-                        {role === "admin" ? "Admin Panel" : "Dashboard"}
-                      </Link>
-
-                      <Link 
-                        to={role === "admin" ? "/admin/settings" : "/dashboard/settings"} 
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                      >
-                        <Settings size={16} />
-                        Settings
-                      </Link>
-
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Link to="/login">
-                  <Button variant="ghost" size="sm" className="hidden sm:flex rounded-xl">Login</Button>
+                  {link.label}
                 </Link>
-                <Link to="/register">
-                  <Button variant="primary" size="sm" className="rounded-xl shadow-lg shadow-primary-500/20">Get Started</Button>
-                </Link>
-              </div>
-            )}
+              ))}
+            </div>
+
+            <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block mx-2" />
+
+            <div className="flex gap-3 items-center">
+              <ThemeToggle />
+              
+              {isAuthenticated ? (
+                <div className="relative hidden md:block" ref={profileRef}>
+                  <button 
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 overflow-hidden border-2 border-transparent hover:border-primary-500 transition-all"
+                  >
+                    <User size={20} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-2 overflow-hidden"
+                      >
+                        <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 mb-2">
+                          <p className="text-sm font-bold text-neutral-900 dark:text-neutral-50 truncate">
+                            {user?.name || "Learner Account"}
+                          </p>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                            {user?.email || (role === "admin" ? "Administrator" : "Student")}
+                          </p>
+                        </div>
+
+                        <Link 
+                          to={role === "admin" ? "/admin" : "/dashboard"}
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                        >
+                          <LayoutDashboard size={16} />
+                          {role === "admin" ? "Admin Panel" : "Dashboard"}
+                        </Link>
+
+                        <Link 
+                          to={role === "admin" ? "/admin/settings" : "/dashboard/settings"} 
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                        >
+                          <Settings size={16} />
+                          Settings
+                        </Link>
+
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors text-left"
+                        >
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="hidden md:flex gap-2">
+                  <Link to="/login">
+                    <Button variant="ghost" size="sm" className="hidden sm:flex rounded-xl">Login</Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button variant="primary" size="sm" className="rounded-xl shadow-lg shadow-primary-500/20">Get Started</Button>
+                  </Link>
+                </div>
+              )}
+
+              {/* Mobile Hamburger Toggle */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all focus-visible:ring-2 focus-visible:ring-primary-500 outline-none"
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              >
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-neutral-950/50 backdrop-blur-sm z-40 md:hidden"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 z-50 md:hidden shadow-2xl"
+            >
+              <div className="flex flex-col h-full p-6">
+                {/* Mobile Drawer Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-lg font-display font-bold text-neutral-900 dark:text-neutral-50">Menu</span>
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 transition-colors"
+                    aria-label="Close menu"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Mobile Nav Links */}
+                <nav className="flex-1 space-y-2">
+                  {mobileMenuItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all ${
+                          isActive
+                            ? "bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400"
+                            : "text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+
+                {/* Mobile Drawer Footer */}
+                <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800">
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                    >
+                      <LogOut size={18} />
+                      Logout
+                    </button>
+                  ) : (
+                    <div className="space-y-2">
+                      <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full">Login</Button>
+                      </Link>
+                      <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="primary" className="w-full">Get Started</Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

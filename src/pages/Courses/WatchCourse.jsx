@@ -3,52 +3,87 @@ import { useParams } from "react-router-dom";
 import Button from "../../components/common/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { mentors } from "../../constants/mentorData";
-import { Play, Sparkles, ChevronRight, X } from "lucide-react";
-
-const lessonsData = [
-  {
-    id: 1,
-    title: "01. Introduction to the Masterclass",
-    duration: "12:45",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    description: "In this opening lesson, your AI mentor introduces the core concepts and the roadmap for your journey ahead."
-  },
-  {
-    id: 2,
-    title: "02. Core Principles & Philosophy",
-    duration: "18:20",
-    video: "https://www.w3schools.com/html/movie.mp4",
-    description: "Deep dive into the underlying philosophy and industry-standard principles that drive success in this field."
-  },
-  {
-    id: 3,
-    title: "03. Advanced Implementation Techniques",
-    duration: "24:15",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    description: "Move from theory to practice with hands-on implementation strategies and AI-assisted troubleshooting."
-  },
-  {
-    id: 4,
-    title: "04. Case Studies & Real World Analysis",
-    duration: "32:10",
-    video: "https://www.w3schools.com/html/movie.mp4",
-    description: "Examine successful real-world applications and learn how to navigate complex challenges effectively."
-  },
-];
+import { Play, Sparkles, ChevronRight, X, Loader2 } from "lucide-react";
+import { getCourseById } from "../../api";
 
 const WatchCourse = () => {
   const { id } = useParams();
 
-  const [currentLesson, setCurrentLesson] = useState(() => {
-    const saved = localStorage.getItem(`lesson-${id}`);
-    return saved ? JSON.parse(saved) : lessonsData[0];
-  });
+  const [course, setCourse] = useState(null);
+  const [lessons, setLessons] = useState([]);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [notes, setNotes] = useState(localStorage.getItem(`notes-${id}`) || "");
   const [selectedMentor, setSelectedMentor] = useState(mentors[0]);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showMentorSwitch, setShowMentorSwitch] = useState(false);
+
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      setLoading(true);
+      try {
+        const data = await getCourseById(id);
+        setCourse(data);
+        if (data.lessons && data.lessons.length > 0) {
+          const normalizedLessons = data.lessons.map((lesson) => ({
+            ...lesson,
+            video: lesson.video || lesson.videoUrl || "https://www.w3schools.com/html/mov_bbb.mp4",
+            duration: lesson.duration || "15:00",
+            description: lesson.description || "No description provided for this lesson.",
+          }));
+          setLessons(normalizedLessons);
+          
+          const saved = localStorage.getItem(`lesson-${id}`);
+          let initialLesson = null;
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              initialLesson = normalizedLessons.find((lesson) => lesson.id === parsed.id);
+            } catch {
+              localStorage.removeItem(`lesson-${id}`);
+            }
+          }
+          setCurrentLesson(initialLesson || normalizedLessons[0]);
+        } else {
+          // Fallback to static mock lessons if course has no lessons yet
+          const fallbackLessons = [
+            {
+              id: 1,
+              title: "01. Introduction to the Masterclass",
+              duration: "12:45",
+              video: "https://www.w3schools.com/html/mov_bbb.mp4",
+              description: "In this opening lesson, your AI mentor introduces the core concepts and the roadmap for your journey ahead."
+            },
+            {
+              id: 2,
+              title: "02. Core Principles & Philosophy",
+              duration: "18:20",
+              video: "https://www.w3schools.com/html/movie.mp4",
+              description: "Deep dive into the underlying philosophy and industry-standard principles that drive success in this field."
+            }
+          ];
+          setLessons(fallbackLessons);
+          setCurrentLesson(fallbackLessons[0]);
+        }
+
+        if (data.teacher) {
+          const matched = mentors.find(
+            (m) => m.name.toLowerCase() === data.teacher.toLowerCase()
+          );
+          if (matched) {
+            setSelectedMentor(matched);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load course details:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourseData();
+  }, [id]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -68,6 +103,26 @@ const WatchCourse = () => {
     setShowMentorSwitch(false);
     setIsVideoLoading(true);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary-500" />
+          <span className="font-bold tracking-widest uppercase text-xs text-neutral-500">Loading course...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!course || !currentLesson) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 p-6">
+        <p className="text-xl font-bold mb-4">Course not found or has no content</p>
+        <Button to="/" variant="primary">Return Home</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
@@ -142,7 +197,7 @@ const WatchCourse = () => {
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-600">Module 01</span>
                 <span className="h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                <span className="text-xs text-neutral-500 font-bold uppercase">Lesson {currentLesson.id} of {lessonsData.length}</span>
+                <span className="text-xs text-neutral-500 font-bold uppercase">Lesson {lessons.findIndex(l => l.id === currentLesson.id) + 1 || 1} of {lessons.length}</span>
               </div>
               <h1 className="text-4xl font-display font-bold text-neutral-900 dark:text-neutral-50 tracking-tight">
                 {currentLesson.title}
@@ -239,7 +294,7 @@ const WatchCourse = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto py-4 px-4 space-y-3">
-          {lessonsData.map((lesson) => (
+          {lessons.map((lesson, idx) => (
             <button
               key={lesson.id}
               onClick={() => {
@@ -258,13 +313,13 @@ const WatchCourse = () => {
                   ? "bg-gradient-to-r from-blue-600 via-indigo-500 to-orange-400 text-white shadow-lg shadow-primary-500/20" 
                   : "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-700"
               }`}>
-                {lesson.id}
+                {idx + 1}
               </div>
               <div className="flex-1">
                 <p className={`text-sm font-bold mb-1 transition-colors ${
                   currentLesson.id === lesson.id ? "text-neutral-900 dark:text-neutral-50" : "text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-200"
                 }`}>
-                  {lesson.title.split('. ')[1]}
+                  {lesson.title.includes(". ") ? lesson.title.split('. ')[1] : lesson.title}
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">

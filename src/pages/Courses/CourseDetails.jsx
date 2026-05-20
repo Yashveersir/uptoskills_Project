@@ -1,23 +1,81 @@
-import { useParams, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useCourses } from "../../hooks/useCourses";
+import { useAuth } from "../../hooks/useAuth";
+import { enrollCourse, checkEnrollmentStatus } from "../../api";
 import Button from "../../components/common/Button";
 import { motion } from "framer-motion";
 import { Clock, BarChart, Star, Users, CheckCircle2, PlayCircle, Globe, Award, ShieldCheck } from "lucide-react";
+import toast from "react-hot-toast";
 
 const CourseDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { courses, selectedCourse: course, loading, getCourses, getCourseById } = useCourses();
 
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
+
   useEffect(() => {
-    if (courses.length === 0) {
-      getCourses();
-    } else {
+    // Immediately select from pre-seeded/cached courses
+    getCourseById(Number(id));
+    // Refresh from API in background
+    getCourses();
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-select after live API data arrives
+  useEffect(() => {
+    if (courses.length > 0) {
       getCourseById(Number(id));
     }
-  }, [id, courses.length, getCourses, getCourseById]);
+  }, [courses, id, getCourseById]);
 
-  if (loading || (!course && courses.length === 0)) {
+  // Check enrollment status if user is authenticated
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!isAuthenticated || !id) return;
+      setCheckingEnrollment(true);
+      try {
+        const res = await checkEnrollmentStatus(id);
+        setIsEnrolled(res.enrolled);
+      } catch (err) {
+        console.warn("Failed to check enrollment status:", err);
+      } finally {
+        setCheckingEnrollment(false);
+      }
+    };
+    checkStatus();
+  }, [id, isAuthenticated]);
+
+  const handleEnroll = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to enroll in courses.");
+      navigate("/login", { state: { from: `/courses/${id}` } });
+      return;
+    }
+
+    if (isEnrolled) {
+      navigate(`/watch/${id}`);
+      return;
+    }
+
+    setEnrolling(true);
+    try {
+      await enrollCourse(id);
+      toast.success("Successfully enrolled!");
+      setIsEnrolled(true);
+      navigate(`/watch/${id}`);
+    } catch (err) {
+      toast.error(err.message || "Failed to enroll. Please try again.");
+    } finally {
+      setEnrolling(false);
+    }
+  };
+
+  // Only show spinner if truly loading AND nothing to show yet
+  if (loading && !course) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
         <div className="flex flex-col items-center gap-4">
@@ -211,11 +269,15 @@ const CourseDetails = () => {
                   </div>
                 </div>
 
-                <Link to={`/watch/${course.id}`} className="block mb-6 focus:outline-none">
-                  <Button variant="primary" className="w-full py-5 text-lg shadow-xl shadow-primary-500/20 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500" size="lg">
-                    Enroll for Free
-                  </Button>
-                </Link>
+                <Button 
+                  variant="primary" 
+                  className="w-full py-5 text-lg shadow-xl shadow-primary-500/20 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 mb-6" 
+                  size="lg"
+                  onClick={handleEnroll}
+                  disabled={enrolling || checkingEnrollment}
+                >
+                  {checkingEnrollment ? "Checking..." : enrolling ? "Enrolling..." : isEnrolled ? "Go to Course" : "Enroll for Free"}
+                </Button>
 
                 <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400">
                   Join {course.students} Students

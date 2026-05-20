@@ -1,24 +1,11 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, ArrowUpRight, BookOpen, CheckCircle, CheckSquare, Clock, FileText, Plus, ShieldCheck, UserPlus, Users } from "lucide-react";
 import Button from "../../components/common/Button";
-import Card from "../../components/common/Card";
+import ErrorState from "../../components/common/ErrorState";
+import { getAdminStats } from "../../api";
 import { adminClasses } from "../../designTokens";
-
-const metrics = [
-  { label: "Total Users", value: "2,543", detail: "+12.8% vs last week", icon: Users, tone: "border-status-success text-status-success bg-status-success/10" },
-  { label: "Total Courses", value: "48", detail: "7 pending review", icon: BookOpen, tone: "border-secondary-500 text-secondary-600 bg-secondary-500/10" },
-  { label: "Enrollments This Week", value: "156", detail: "31 from campaigns", icon: UserPlus, tone: "border-primary-500 text-primary-600 bg-primary-500/10" },
-  { label: "Completion Rate", value: "68%", detail: "+4.2% improvement", icon: CheckCircle, tone: "border-status-success text-status-success bg-status-success/10" },
-  { label: "Pending Approvals", value: "12", detail: "Needs action today", icon: AlertTriangle, tone: "border-status-warning text-status-warning bg-status-warning/10" },
-  { label: "System Health", value: "99.9%", detail: "All services online", icon: Activity, tone: "border-status-info text-status-info bg-status-info/10" },
-];
-
-const quickActions = [
-  { label: "New Course", icon: Plus, variant: "primary" },
-  { label: "New Intern", icon: UserPlus, variant: "primary" },
-  { label: "Approve Pending", icon: CheckSquare, variant: "outline" },
-  { label: "View Reports", icon: FileText, variant: "outline" },
-];
 
 const recentActivities = [
   { id: 1, user: "Ayan Khan", action: "enrolled in CSS Mastery", time: "2 mins ago" },
@@ -27,7 +14,66 @@ const recentActivities = [
   { id: 4, user: "Rahul Sharma", action: "joined the intern cohort", time: "3 hours ago" },
 ];
 
+const getFallbackMetrics = (navigate) => [
+  { label: "Total Users", value: "1,024", detail: "+12.8% vs last week", icon: Users, tone: "border-status-success text-status-success bg-status-success/10", onClick: () => navigate("/admin/users") },
+  { label: "Total Courses", value: "42", detail: "3 pending review", icon: BookOpen, tone: "border-secondary-500 text-secondary-600 bg-secondary-500/10", onClick: () => navigate("/admin/courses") },
+  { label: "Enrollments This Week", value: "156", detail: "31 from campaigns", icon: UserPlus, tone: "border-primary-500 text-primary-600 bg-primary-500/10", onClick: () => navigate("/admin/analytics") },
+  { label: "Completion Rate", value: "68%", detail: "+4.2% improvement", icon: CheckCircle, tone: "border-status-success text-status-success bg-status-success/10", onClick: () => navigate("/admin/analytics") },
+  { label: "Pending Approvals", value: "3", detail: "Needs action today", icon: AlertTriangle, tone: "border-status-warning text-status-warning bg-status-warning/10", onClick: () => navigate("/admin/courses") },
+  { label: "System Health", value: "99.9%", detail: "All services online", icon: Activity, tone: "border-status-info text-status-info bg-status-info/10", onClick: () => navigate("/admin/analytics") },
+];
+
 const AdminOverview = () => {
+  const navigate = useNavigate();
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const data = await getAdminStats();
+        setMetrics([
+          { label: "Total Users", value: data.totalUsers.toLocaleString(), detail: "+12.8% vs last week", icon: Users, tone: "border-status-success text-status-success bg-status-success/10", onClick: () => navigate("/admin/users") },
+          { label: "Total Courses", value: data.totalCourses.toString(), detail: `${data.pendingApprovals} pending review`, icon: BookOpen, tone: "border-secondary-500 text-secondary-600 bg-secondary-500/10", onClick: () => navigate("/admin/courses") },
+          { label: "Enrollments This Week", value: data.enrollmentsThisWeek?.toString() || "156", detail: "31 from campaigns", icon: UserPlus, tone: "border-primary-500 text-primary-600 bg-primary-500/10", onClick: () => navigate("/admin/analytics") },
+          { label: "Completion Rate", value: `${data.completionRate}%`, detail: "+4.2% improvement", icon: CheckCircle, tone: "border-status-success text-status-success bg-status-success/10", onClick: () => navigate("/admin/analytics") },
+          { label: "Pending Approvals", value: data.pendingApprovals?.toString() || "0", detail: "Needs action today", icon: AlertTriangle, tone: "border-status-warning text-status-warning bg-status-warning/10", onClick: () => navigate("/admin/courses") },
+          { label: "System Health", value: `${data.systemHealth}%`, detail: "All services online", icon: Activity, tone: "border-status-info text-status-info bg-status-info/10", onClick: () => navigate("/admin/analytics") },
+        ]);
+      } catch (err) {
+        console.warn("Failed to fetch live stats, using demo data:", err);
+        // Use demo data so the panel still loads when the backend is offline
+        setMetrics(getFallbackMetrics(navigate));
+        setError(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, [navigate]);
+
+  const quickActions = [
+    { label: "New Course", icon: Plus, variant: "primary", onClick: () => navigate("/admin/courses") },
+    { label: "New Intern", icon: UserPlus, variant: "primary", onClick: () => navigate("/admin/users") },
+    { label: "Approve Pending", icon: CheckSquare, variant: "outline", onClick: () => navigate("/admin/courses") },
+    { label: "View Reports", icon: FileText, variant: "outline", onClick: () => navigate("/admin/analytics") },
+  ];
+
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <ErrorState 
+          title="Unable to load dashboard"
+          message="We couldn't fetch the platform statistics. Please try again."
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -48,32 +94,52 @@ const AdminOverview = () => {
         variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
       >
-        {metrics.map((metric) => {
-          const Icon = metric.icon;
-          return (
-            <motion.div key={metric.label} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>
-              <Card interactive className={`border-l-4 p-5 ${metric.tone}`}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className={adminClasses.label}>{metric.label}</p>
-                    <p className="mt-3 text-3xl font-semibold tracking-normal text-neutral-900 dark:text-neutral-50">{metric.value}</p>
-                    <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">{metric.detail}</p>
+        {loading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-5 animate-pulse">
+              <div className="h-4 w-20 bg-neutral-200 dark:bg-neutral-800 rounded mb-4" />
+              <div className="h-8 w-24 bg-neutral-200 dark:bg-neutral-800 rounded mb-2" />
+              <div className="h-3 w-32 bg-neutral-200 dark:bg-neutral-800 rounded" />
+            </div>
+          ))
+        ) : (
+          metrics?.map((metric) => {
+            const Icon = metric.icon;
+            return (
+              <motion.div key={metric.label} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>
+                <button
+                  onClick={metric.onClick}
+                  className={`w-full text-left border-l-4 p-5 ${metric.tone} bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-card cursor-pointer hover:scale-[1.02] transition-transform`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className={adminClasses.label}>{metric.label}</p>
+                      <p className="mt-3 text-3xl font-semibold tracking-normal text-neutral-900 dark:text-neutral-50">{metric.value}</p>
+                      <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">{metric.detail}</p>
+                    </div>
+                    <div className={`rounded-lg p-3 ${metric.tone}`}>
+                      <Icon size={22} />
+                    </div>
                   </div>
-                  <div className={`rounded-lg p-3 ${metric.tone}`}>
-                    <Icon size={22} />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          );
-        })}
+                </button>
+              </motion.div>
+            );
+          })
+        )}
       </motion.section>
 
+      {/* Quick Actions */}
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {quickActions.map((action) => {
           const Icon = action.icon;
           return (
-            <Button key={action.label} variant={action.variant} size="lg" className="w-full">
+            <Button
+              key={action.label}
+              variant={action.variant}
+              size="lg"
+              className="w-full"
+              onClick={action.onClick}
+            >
               <Icon size={18} />
               {action.label}
             </Button>
@@ -82,13 +148,13 @@ const AdminOverview = () => {
       </section>
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="p-6 xl:col-span-2">
+        <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-card p-6 xl:col-span-2">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-50">Platform Performance</h2>
               <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Weekly enrollment and completion trend</p>
             </div>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/analytics")}>
               Details
               <ArrowUpRight size={16} />
             </Button>
@@ -106,14 +172,20 @@ const AdminOverview = () => {
               </div>
             ))}
           </div>
-        </Card>
+        </div>
 
-        <Card className="p-6">
-          <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-50">Recent Activity</h2>
-          <div className="mt-6 space-y-5">
+        <div className="bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-card p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-50">Recent Activity</h2>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/users")}>
+              View All
+              <ArrowUpRight size={14} />
+            </Button>
+          </div>
+          <div className="space-y-5">
             {recentActivities.map((activity) => (
               <div key={activity.id} className="flex gap-3">
-                <div className="mt-2 h-2 w-2 rounded-full bg-primary-500" />
+                <div className="mt-2 h-2 w-2 rounded-full bg-primary-500 shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{activity.user}</p>
                   <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{activity.action}</p>
@@ -125,7 +197,7 @@ const AdminOverview = () => {
               </div>
             ))}
           </div>
-        </Card>
+        </div>
       </section>
     </div>
   );

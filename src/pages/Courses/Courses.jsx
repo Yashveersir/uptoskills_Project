@@ -7,32 +7,46 @@ import Input from "../../components/common/Input";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, ChevronDown, LayoutGrid, BookOpen, Compass } from "lucide-react";
 
+import { getCategories } from "../../api";
+
 const Courses = () => {
   const { courses, loading, getCourses } = useCourses();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [categories, setCategories] = useState(["All Categories", "Development", "Design"]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch courses via hook
+  // Fetch courses and categories
   useEffect(() => {
     getCourses();
+    const fetchCats = async () => {
+      try {
+        const cats = await getCategories();
+        if (cats && cats.length > 0) {
+          setCategories(["All Categories", ...cats.map((c) => c.name)]);
+        }
+      } catch (err) {
+        console.warn("Failed to load dynamic categories:", err);
+      }
+    };
+    fetchCats();
   }, [getCourses]);
 
   // Filter Logic
   const filteredCourses = (courses || []).filter((course) => {
-    const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase()) || 
-                         course.teacher.toLowerCase().includes(search.toLowerCase());
-    const matchesTab = activeTab === "All" || course.type === activeTab;
-    const matchesLevel = selectedLevel === "All Levels" || course.level === selectedLevel;
-    const matchesCategory = selectedCategory === "All Categories" || course.category === selectedCategory;
+    const matchesSearch = 
+      (course?.title?.toLowerCase() || "").includes(search.toLowerCase()) || 
+      (course?.teacher?.toLowerCase() || "").includes(search.toLowerCase());
+    const matchesTab = activeTab === "All" || course?.type === activeTab;
+    const matchesLevel = selectedLevel === "All Levels" || course?.level === selectedLevel;
+    const matchesCategory = selectedCategory === "All Categories" || course?.category === selectedCategory;
 
     return matchesSearch && matchesTab && matchesLevel && matchesCategory;
   });
 
   const levels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
-  const categories = ["All Categories", "Development", "Design"];
   const tabs = [
     { name: "All", icon: LayoutGrid },
     { name: "Course", icon: BookOpen },

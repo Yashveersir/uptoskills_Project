@@ -1,57 +1,64 @@
-import axios from "axios";
-import store from "../store";
-import { logout } from "../store/slices/authSlice";
-import toast from "react-hot-toast";
+/**
+ * src/api/axios.js
+ * ─────────────────────────────────────────────────────────────────────
+ * Configured Axios instance shared across all API modules.
+ *
+ * Features:
+ *  - Attaches the JWT Bearer token to every request automatically
+ *  - Handles 401 Unauthorized by clearing auth state and redirecting
+ *  - Extracts human-readable error messages from server responses
+ * ─────────────────────────────────────────────────────────────────────
+ */
 
-const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://jsonplaceholder.typicode.com",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+import axios from "axios";
+import { clearAuthData } from "../utils/tokenStorage";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
+  timeout: 15000,
 });
 
-// Request Interceptor: Add Auth Token
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = store.getState().auth.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// ── Request interceptor: attach JWT ───────────────────────────────────
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Response Interceptor: Global Error Handling
-axiosInstance.interceptors.response.use(
+// ── Response interceptor: handle errors ──────────────────────────────
+api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const { response } = error;
-
-    if (response) {
-      // Token expired or unauthorized
-      if (response.status === 401) {
-        store.dispatch(logout());
-        toast.error("Session expired. Please login again.");
+    // Session expired or invalid token — force logout
+    if (error.response?.status === 401) {
+      clearAuthData();
+      // Only redirect if we're not already on an auth page
+      if (!window.location.pathname.startsWith("/login") &&
+          !window.location.pathname.startsWith("/register")) {
         window.location.href = "/login";
-      } else {
-        // Other server errors
-        const message = response.data?.message || "An unexpected error occurred";
-        toast.error(message);
       }
-    } else if (error.request) {
-      // Network error (no response received)
-      toast.error("Network error. Please check your connection.");
-    } else {
-      // Something else happened
-      toast.error("An error occurred. Please try again.");
+    }
+
+    // Extract the clearest possible error message for the UI
+    const serverMessage = error.response?.data?.error     // { success: false, error: "..." }
+                       || error.response?.data?.message;  // legacy shape fallback
+
+    if (serverMessage) {
+      error.message = serverMessage;
+    } else if (error.code === "ECONNREFUSED" || error.message === "Network Error") {
+      error.message = "Cannot connect to server. Make sure the backend is running on port 5000.";
     }
 
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+/** Helper — unwrap the server envelope { success, data } → data */
+export const unwrap = (response) => response.data?.data ?? response.data;
+
+export default api;

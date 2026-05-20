@@ -1,10 +1,12 @@
 import AppRouter from "./routes/AppRouter";
+import ScrollToTop from "./components/common/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <>
       <AppRouter />
+      <ScrollToTop threshold={400} />
 
       <Toaster
         position="top-right"

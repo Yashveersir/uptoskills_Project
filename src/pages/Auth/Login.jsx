@@ -13,25 +13,26 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
 
   const validateEmail = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
   };
+
+  const emailValid = validateEmail(email);
+  const passwordValid = password.length >= 6;
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setTouched({ email: true, password: true });
 
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!emailValid) {
       setError("Please enter a valid email address.");
       return;
     }
@@ -40,13 +41,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 px-6 py-12 relative overflow-hidden">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-8 md:p-10 shadow-card"
-      >
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+      className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 px-6 py-12"
+    >
+      <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-8 md:p-10 shadow-card">
         <div className="text-center mb-10">
           <Link to="/" className="inline-flex items-center gap-2 mb-6 group">
             <div className="w-12 h-12 bg-primary-500 rounded-lg flex items-center justify-center transition-transform group-hover:rotate-6 shadow-lg shadow-primary-500/20">
@@ -73,14 +74,20 @@ const Login = () => {
           </motion.div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <Input
             label="Email Address"
             type="email"
             placeholder="alex@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            onBlur={() => setTouched((t) => ({ ...t, email: true }))}
             icon={Mail}
+            isValid={email.length > 0 && emailValid}
+            error={touched.email && email.length > 0 && !emailValid ? "Enter a valid email address." : ""}
           />
 
           <div className="space-y-1">
@@ -96,13 +103,20 @@ const Login = () => {
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
+              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
               icon={Lock}
+              isValid={password.length > 0 && passwordValid}
+              error={touched.password && password.length > 0 && !passwordValid ? "Password must be at least 6 characters." : ""}
               rightElement={
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -131,20 +145,28 @@ const Login = () => {
 
         {/* Demo Credentials Helper */}
         <div className="mt-8 p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-800">
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 mb-2 text-center">Demo Access</p>
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 mb-2 text-center">Demo Access — Click to fill</p>
           <div className="space-y-1">
-            <div className="flex justify-between text-[10px] text-neutral-500 dark:text-neutral-400">
-              <span>User: demo@gmail.com</span>
-              <span className="font-mono">123456</span>
-            </div>
-            <div className="flex justify-between text-[10px] text-neutral-500 dark:text-neutral-400">
-              <span>Admin: admin@gmail.com</span>
-              <span className="font-mono">admin123</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => { setEmail("demo@example.com"); setPassword("Demo@123456"); }}
+              className="w-full flex justify-between text-[10px] text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors px-2 py-1 rounded hover:bg-primary-50 dark:hover:bg-primary-900/20"
+            >
+              <span>Student: demo@example.com</span>
+              <span className="font-mono">Demo@123456</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail("admin@example.com"); setPassword("Admin@123456"); }}
+              className="w-full flex justify-between text-[10px] text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors px-2 py-1 rounded hover:bg-primary-50 dark:hover:bg-primary-900/20"
+            >
+              <span>Admin: admin@example.com</span>
+              <span className="font-mono">Admin@123456</span>
+            </button>
           </div>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 };
 
