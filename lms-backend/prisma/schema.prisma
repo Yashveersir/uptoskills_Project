@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  email String @unique
+
+  password String
+
+  role String @default("user")
+
+  verified Boolean @default(false)
+
+  avatar String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  enrollments Enrollment[]
+
+  progresses Progress[]
+
+  otps OTP[]
+
+  notifications Notification[]
+
+  courses Course[]
+
+  @@index([email])
+}
+
+model Mentor {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  image String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  enrollments Enrollment[]
+}
+
+model Course {
+  id Int @id @default(autoincrement())
+
+  title String
+
+  description String
+
+  category String
+
+  level String
+
+  thumbnail String?
+
+  status String @default("pending")
+
+  rejectionMessage String?
+
+  createdBy Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  lessons Lesson[]
+
+  enrollments Enrollment[]
+
+  creator User @relation(
+  fields: [createdBy],
+  references: [id]
+)
+
+  @@index([title])
+  @@index([category])
+  @@index([level])
+}
+
+model Lesson {
+  id Int @id @default(autoincrement())
+
+  title String
+
+  description String?
+
+  videoUrl String
+
+  pdfUrl String?
+
+  duration Int?
+
+  courseId Int
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id])
+
+  progresses Progress[]
+
+  @@index([title])
+}
+
+model Enrollment {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  courseId Int
+
+  mentorId Int
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  course Course @relation(fields: [courseId], references: [id])
+
+  mentor Mentor @relation(fields: [mentorId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  lessonId Int
+
+  completed Boolean @default(false)
+
+  timeSpent Int @default(0)
+
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+enum OtpType {
+  REGISTER
+  LOGIN
+  RESET_PASSWORD
+}
+
+model OTP {
+  id Int @id @default(autoincrement())
+
+  email String
+
+  otp String
+
+  type OtpType
+
+  expiresAt DateTime
+
+  verified Boolean @default(false)
+
+  attempts Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  userId Int?
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@unique([email, type])
+  @@index([email])
+}
+
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+
+  title     String
+  message   String
+
+  isRead    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
