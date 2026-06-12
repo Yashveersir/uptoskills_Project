@@ -44,5 +44,9 @@ export const updateMyProfileService = async (userId, data) => {
     });
 
     return updatedUser;
+<<<<<<< HEAD
 };
 
+=======
+};
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

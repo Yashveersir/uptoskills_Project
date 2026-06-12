@@ -3,11 +3,15 @@ import {
     getAllUsersService,
     getAllCoursesAdminService,
     getAllEnrollmentsService,
+<<<<<<< HEAD
     searchUsersService,
     getUserAnalyticsService,
     getCourseAnalyticsService,
     getCompletionAnalyticsService,
     getPendingApprovalCountService
+=======
+    searchUsersService
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 } from "../services/adminService.js";
 
 
@@ -33,6 +37,10 @@ export const dashboardController = async (
 };
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 // GET USERS
 export const getAllUsersController = async (
     req,
@@ -41,8 +49,12 @@ export const getAllUsersController = async (
 ) => {
     try {
 
+<<<<<<< HEAD
         const users =
             await getAllUsersService();
+=======
+        const users = await getAllUsersService();
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
         res.status(200).json({
             success: true,
@@ -55,6 +67,11 @@ export const getAllUsersController = async (
 };
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 // GET COURSES
 export const getAllCoursesAdminController =
 async (req, res, next) => {
@@ -74,6 +91,11 @@ async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 // GET ENROLLMENTS
 export const getAllEnrollmentsController =
 async (req, res, next) => {
@@ -92,6 +114,10 @@ async (req, res, next) => {
     }
 };
 
+<<<<<<< HEAD
+=======
+// SEARCH USERS
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
 // SEARCH USERS
 export const searchUsersController = async (
@@ -112,6 +138,7 @@ export const searchUsersController = async (
     } catch (error) {
         next(error);
     }
+<<<<<<< HEAD
 };
 
 
@@ -226,4 +253,6 @@ async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 };

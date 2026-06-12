@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 import express from "express";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
@@ -10,6 +13,7 @@ import {
 
 const router = express.Router();
 
+<<<<<<< HEAD
 /**
  * @swagger
  * tags:
@@ -59,3 +63,14 @@ router.get(
 
 export default router;
 
+=======
+
+// ENROLL IN COURSE
+router.post("/:courseId",authMiddleware,enrollCourseController);
+
+
+// GET MY COURSES
+router.get("/my-courses",authMiddleware,getMyCoursesController);
+
+export default router;
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

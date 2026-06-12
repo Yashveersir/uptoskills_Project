@@ -32,10 +32,13 @@ model User {
 
   otps OTP[]
 
+<<<<<<< HEAD
   notifications Notification[]
 
   courses Course[]
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
   @@index([email])
 }
 
@@ -70,8 +73,11 @@ model Course {
 
   rejectionMessage String?
 
+<<<<<<< HEAD
   createdBy Int
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
@@ -80,11 +86,14 @@ model Course {
 
   enrollments Enrollment[]
 
+<<<<<<< HEAD
   creator User @relation(
   fields: [createdBy],
   references: [id]
 )
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
   @@index([title])
   @@index([category])
   @@index([level])
@@ -192,6 +201,7 @@ model OTP {
   @@unique([email, type])
   @@index([email])
 }
+<<<<<<< HEAD
 
 
 model Notification {
@@ -210,3 +220,5 @@ model Notification {
 
   @@index([userId])
 }
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

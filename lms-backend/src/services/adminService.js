@@ -213,6 +213,7 @@ export const searchUsersService = async (query) => {
         totalPages: Math.ceil(total / limitNumber)
     };
 };
+<<<<<<< HEAD
 
 
 export const getUserAnalyticsService = async () => {
@@ -409,3 +410,5 @@ export const uploadLessonVideoService = async (
         }
     });
 };
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

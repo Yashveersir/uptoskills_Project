@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 import {uploadAvatarService ,
     uploadCourseThumbnailService,
     uploadVideoService,
     uploadPdfService
 } from "../services/uploadService.js"
+=======
+import {uploadAvatarService ,uploadCourseThumbnailService} from "../services/uploadService.js"
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 export const uploadAvatarController = async ( req,res,next) => {
     try {
 
@@ -51,6 +55,7 @@ export const uploadCourseThumbnailController = async (
     } catch (error) {
         next(error);
     }
+<<<<<<< HEAD
 };
 
 export const uploadVideoController = async (
@@ -101,3 +106,6 @@ export const uploadPdfController = async (
     }
 };
 
+=======
+};
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

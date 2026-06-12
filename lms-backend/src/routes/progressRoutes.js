@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 import express from "express";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
@@ -11,6 +14,7 @@ import {
 
 const router = express.Router();
 
+<<<<<<< HEAD
 /**
  * @swagger
  * tags:
@@ -36,12 +40,17 @@ const router = express.Router();
  *       404:
  *         description: Lesson not found
  */
+=======
+
+// MARK LESSON COMPLETE
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 router.post(
     "/:lessonId",
     authMiddleware,
     markLessonCompleteController
 );
 
+<<<<<<< HEAD
 /**
  * @swagger
  * /api/progress/course/{courseId}:
@@ -58,12 +67,17 @@ router.post(
  *       200:
  *         description: Course progress fetched
  */
+=======
+
+// GET COURSE PROGRESS
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 router.get(
     "/course/:courseId",
     authMiddleware,
     getCourseProgressController
 );
 
+<<<<<<< HEAD
 /**
  * @swagger
  * /api/progress/{lessonId}/time:
@@ -80,11 +94,18 @@ router.get(
  *       200:
  *         description: Time updated successfully
  */
+=======
+// UPDATE LESSON TIME
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 router.post(
     "/:lessonId/time",
     authMiddleware,
     updateLessonTimeController
 );
 
+<<<<<<< HEAD
 export default router;
 
+=======
+export default router;
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

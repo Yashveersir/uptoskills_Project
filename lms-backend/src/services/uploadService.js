@@ -46,6 +46,7 @@ export const uploadCourseThumbnailService = async (
             thumbnail: result.secure_url
         }
     });
+<<<<<<< HEAD
 };
 
 
@@ -79,3 +80,6 @@ export const uploadPdfService = async (filePath) => {
     return result.secure_url;
 };
 
+=======
+};
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

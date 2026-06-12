@@ -1,5 +1,6 @@
 import multer from "multer";
 
+<<<<<<< HEAD
 const storage = multer.diskStorage({});
 
 const fileFilter = (req, file, cb) => {
@@ -33,5 +34,16 @@ const upload = multer({
 
     fileFilter
 });
+=======
+const  storage=multer.diskStorage({});
+
+
+const upload=multer({
+    storage,
+    limits:{
+        fileSize: 10 * 1024 * 1024     // 10MB
+    }
+})
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
 export default upload;

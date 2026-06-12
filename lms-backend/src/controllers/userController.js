@@ -34,5 +34,9 @@ export const updateMyProfile = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+<<<<<<< HEAD
 };
 
+=======
+};
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a

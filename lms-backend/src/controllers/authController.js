@@ -11,6 +11,7 @@ import {
 
 import { generateOTP } from "../utils/generateOTP.js";
 import { sendMail } from "../services/sendMail.js";
+<<<<<<< HEAD
 import { otpTemplate } from "../templates/otpTemplates.js";
 import { resendOtpService } from "../services/resendOtpService.js";
 
@@ -21,11 +22,33 @@ export const registerController = async (req, res, next) => {
     try {
 
         const { email } = req.validated;
+=======
+
+import { otpTemplate } from "../templates/otpTemplates.js";
+import { forgotPasswordTemplate } from "../templates/forgotPasswordTemplate.js";
+
+import { resendOtpService } from "../services/resendOtpService.js";
+
+
+
+
+// REGISTER (SEND OTP)
+
+export const registerController = async (req, res, next) => {
+    try {
+        const { name, email, password } = req.body;
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
         const otp = generateOTP();
 
         await registerService({
+<<<<<<< HEAD
             email,
+=======
+            name,
+            email,
+            password,
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
             otp
         });
 
@@ -35,9 +58,15 @@ export const registerController = async (req, res, next) => {
             otpTemplate({ otp })
         );
 
+<<<<<<< HEAD
         return res.status(200).json({
             success: true,
             message: "OTP sent successfully"
+=======
+        res.status(200).json({
+            success: true,
+            message: "OTP sent to email successfully"
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
         });
 
     } catch (error) {
@@ -46,6 +75,7 @@ export const registerController = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 // ---------------- VERIFY REGISTER OTP ----------------
 
 export const verifyOtpController = async (req, res, next) => {
@@ -60,6 +90,20 @@ export const verifyOtpController = async (req, res, next) => {
             message: "Account verified successfully",
             user: result.user,
             token: result.token
+=======
+
+// VERIFY OTP (REGISTER)
+
+export const verifyOtpController = async (req, res, next) => {
+    try {
+        const data = await verifyOtpService(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "User verified successfully",
+            user: data.user,
+            token: data.token
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
         });
 
     } catch (error) {
@@ -68,6 +112,7 @@ export const verifyOtpController = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 // ---------------- RESEND OTP ----------------
 
 export const resendOtpController = async (req, res, next) => {
@@ -90,6 +135,31 @@ export const resendOtpController = async (req, res, next) => {
         );
 
         return res.status(200).json({
+=======
+
+// RESEND OTP
+
+export const resendOtpController = async (req, res, next) => {
+    try {
+        const { email, type = "REGISTER" } = req.body;
+
+        if (!email) {
+            res.status(400);
+            throw new Error("Email is required");
+        }
+
+        const otp = generateOTP();
+
+        await resendOtpService({ email, otp, type });
+
+        await sendMail(
+            email,
+            "Resend OTP - LMS App",
+            otpTemplate({ otp })   // 
+        );
+
+        res.status(200).json({
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
             success: true,
             message: "OTP resent successfully"
         });
@@ -99,6 +169,7 @@ export const resendOtpController = async (req, res, next) => {
     }
 };
 
+<<<<<<< HEAD
 
 // ---------------- LOGIN ----------------
 
@@ -132,6 +203,22 @@ export const sendLoginOtpController = async (req, res, next) => {
         await sendLoginOtpService(email);
 
         return res.status(200).json({
+=======
+// LOGIN via OTP
+
+export const sendLoginOtpController = async (
+    req,
+    res,
+    next
+) => {
+    try {
+
+        await sendLoginOtpService(
+            req.body.email
+        );
+
+        res.status(200).json({
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
             success: true,
             message: "OTP sent successfully"
         });
@@ -141,6 +228,7 @@ export const sendLoginOtpController = async (req, res, next) => {
     }
 };
 
+<<<<<<< HEAD
 
 // ---------------- VERIFY LOGIN OTP ----------------
 
@@ -159,6 +247,27 @@ export const verifyLoginOtpController = async (req, res, next) => {
             message: "Login successful",
             user: result.user,
             token: result.token
+=======
+export const verifyLoginOtpController = async (
+    req,
+    res,
+    next
+) => {
+    try {
+
+        const { email, otp } = req.body;
+
+        const result =
+            await verifyLoginOtpService(
+                email,
+                otp
+            );
+
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            ...result
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
         });
 
     } catch (error) {
@@ -167,6 +276,7 @@ export const verifyLoginOtpController = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 // ---------------- FORGOT PASSWORD ----------------
 
 export const forgotPasswordController = async (req, res, next) => {
@@ -185,6 +295,22 @@ export const forgotPasswordController = async (req, res, next) => {
             success: true,
             message:
                 "If an account exists, an OTP has been sent."
+=======
+
+
+
+
+// LOGIN
+
+export const loginController = async (req, res, next) => {
+    try {
+        const data = await loginService(req.body);
+
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            user: data.user,
+            token: data.token
         });
 
     } catch (error) {
@@ -193,6 +319,36 @@ export const forgotPasswordController = async (req, res, next) => {
 };
 
 
+
+// FORGOT PASSWORD (SEND OTP)
+
+export const forgotPasswordController = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        const otp = generateOTP();
+
+        await forgotPasswordService({ email, otp });
+
+        await sendMail(
+            email,
+            "Password Reset OTP - LMS App",
+            forgotPasswordTemplate({ otp })
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "OTP sent to email for password reset"
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+<<<<<<< HEAD
 // ---------------- VERIFY RESET OTP ----------------
 
 export const verifyResetOtpController = async (req, res, next) => {
@@ -203,6 +359,16 @@ export const verifyResetOtpController = async (req, res, next) => {
         );
 
         return res.status(200).json({
+=======
+
+// VERIFY RESET OTP
+
+export const verifyResetOtpController = async (req, res, next) => {
+    try {
+        await verifyResetOtpService(req.body);
+
+        res.status(200).json({
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
             success: true,
             message: "OTP verified successfully"
         });
@@ -213,6 +379,7 @@ export const verifyResetOtpController = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 // ---------------- RESET PASSWORD ----------------
 
 export const resetPasswordController = async (req, res, next) => {
@@ -223,6 +390,16 @@ export const resetPasswordController = async (req, res, next) => {
         );
 
         return res.status(200).json({
+=======
+
+// RESET PASSWORD
+
+export const resetPasswordController = async (req, res, next) => {
+    try {
+        await resetPasswordService(req.body);
+
+        res.status(200).json({
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
             success: true,
             message: "Password reset successful"
         });
@@ -232,15 +409,33 @@ export const resetPasswordController = async (req, res, next) => {
     }
 };
 
+<<<<<<< HEAD
 
 // ---------------- LOGOUT ----------------
+=======
+// LOGOUT 
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
 export const logoutController = async (req, res, next) => {
     try {
 
+<<<<<<< HEAD
         return res.status(200).json({
             success: true,
             message: "Logged out successfully"
+=======
+       
+        const user = req.user;
+
+        if (!user) {
+            res.status(401);
+            throw new Error("Not authorized");
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `User ${user.email} logged out successfully`
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
         });
 
     } catch (error) {

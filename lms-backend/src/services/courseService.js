@@ -1,10 +1,16 @@
 import prisma from "../config/prisma.js";
 
+<<<<<<< HEAD
 import {createNotificationService} from "./notificationService.js";
 
 
 // CREATE COURSE
 export const createCourseService = async (data, userId) => {
+=======
+
+// CREATE COURSE
+export const createCourseService = async (data) => {
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 
     const {
         title,
@@ -24,8 +30,12 @@ export const createCourseService = async (data, userId) => {
             description,
             category,
             level,
+<<<<<<< HEAD
             thumbnail,
             createdBy: Number(userId)
+=======
+            thumbnail
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
         }
     });
 
@@ -230,7 +240,10 @@ export const getPendingCoursesService = async () => {
 // APPROVE  COURSE
 
 export const approveCourseService = async (courseId) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
     const course = await prisma.course.findUnique({
         where: {
             id: Number(courseId)
@@ -244,6 +257,7 @@ export const approveCourseService = async (courseId) => {
     const updatedCourse = await prisma.course.update({
         where: {
             id: Number(courseId)
+<<<<<<< HEAD
         },
         data: {
             status: "approved",
@@ -271,6 +285,22 @@ export const rejectCourseService = async (
     reason
 ) => {
 
+=======
+        },  
+        data: {
+            status: "approved",
+            rejectionMessage: null
+        }   
+    });
+    return updatedCourse;
+
+
+}
+
+// REJECT COURSE
+
+export const rejectCourseService = async (courseId, reason) => {
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
     const course = await prisma.course.findUnique({
         where: {
             id: Number(courseId)
@@ -284,6 +314,7 @@ export const rejectCourseService = async (
     const updatedCourse = await prisma.course.update({
         where: {
             id: Number(courseId)
+<<<<<<< HEAD
         },
         data: {
             status: "rejected",
@@ -304,6 +335,17 @@ export const rejectCourseService = async (
 
 
 
+=======
+        },  
+        data: {
+            status: "rejected",
+            rejectionMessage: reason
+        }   
+    });
+    return updatedCourse;
+};
+
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 // PENDING COURSES COUNT
 
 export const getPendingCoursesCountService = async () => {

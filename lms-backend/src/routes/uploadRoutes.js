@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import express from "express";
 
@@ -13,11 +14,23 @@ import {
     uploadVideoController,
     uploadPdfController,
     uploadCourseThumbnailController
+=======
+import express from "express";
+
+import upload from "../middleware/uploadMiddleware.js";
+
+import { authMiddleware }
+from "../middleware/authMiddleware.js";
+
+import {
+    uploadAvatarController
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
 }
 from "../controllers/uploadController.js";
 
 const router = express.Router();
 
+<<<<<<< HEAD
 /**
  * @swagger
  * tags:
@@ -106,3 +119,8 @@ router.post(
 
 export default router;
 
+=======
+router.post("/avatar",authMiddleware,upload.single("avatar"), uploadAvatarController);
+
+export default router;
+>>>>>>> 1ef6774424e0176c24819dabdeec33e29d46084a
